@@ -6,18 +6,18 @@ import PackageDescription
 let package = Package(
     name: "Imperial",
     products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
-        .library(
-            name: "Imperial",
-            targets: ["Imperial"]),
+      // Products define the executables and libraries a package produces, making them visible to other packages.
+      .library( name: "Imperial", targets: ["Imperial"]),
+    ],
+    dependencies: [
+      .package(url: "https://github.com/vapor/vapor.git", from: "4.92.4"),
     ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
-        .target(
-            name: "Imperial"),
-        .testTarget(
-            name: "ImperialTests",
-            dependencies: ["Imperial"]),
+      // Targets are the basic building blocks of a package, defining a module or a test suite.
+      // Targets can depend on other targets in this package and products from dependencies.
+      .target(name: "Imperial"),
+      .testTarget(
+        name: "ImperialTests",
+        dependencies: ["Imperial"]),
     ]
 )
