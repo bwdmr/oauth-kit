@@ -10,7 +10,8 @@ let package = Package(
       .library(name: "ImperialCore", targets: ["ImperialCore"]),
       .library(name: "ImperialGoogle", targets: ["ImperialCore", "ImperialGoogle"]),
       .library(name: "Imperial", targets: [
-        "ImperialCore"
+        "ImperialCore",
+        "ImperialGoogle"
       ]),
     ],
     dependencies: [
