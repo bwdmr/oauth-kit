@@ -1,5 +1,7 @@
 import Vapor
 
+
+
 /// This approach is suitable for client applications that don't need long-lived access to resources
 /// or when the resource server doesn't support or want to issue refresh tokens.
 /// ex.: Federated Login or access to regulated and/or compliance requirement-related data.

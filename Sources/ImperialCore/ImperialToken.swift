@@ -57,6 +57,10 @@ public struct ImperialToken: GenericImperialToken {
     self.body = imperialtokenBody
     self.handler = callback
   }
+  
+  override func callback(req: Request, body: ImperialBody) async throws {
+    
+  }
 }
 
 

@@ -1,5 +1,7 @@
 import Vapor
 
+
+
 /// This approach is suitable for client and server applications that need long-lived access to resources.
 /// ex.: Applications with long sessions or access to resources even when the authority is not available.
  
