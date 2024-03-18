@@ -61,15 +61,19 @@ extension ImperialService {
     app.get(authorizationpathComponents) { request -> Response in
       let authorizationtokenKey = "code"
       let requestqueryCode: String = try request.query.get(at: authorizationtokenKey)
-      let scheme = try authURL.scheme.value(or: Abort(.notFound))
-      let host = try authURL.host.value(or: Abort(.notFound))
-      let path = try authURL.path
+      
+      guard
+        let scheme = self.authURL.scheme,
+        let host = self.authURL.host
+      else { throw Abort(.notFound) }
+      
+      let path = self.authURL.path
       
       authorizationtokenBody.code = requestqueryCode
-      token.scheme = scheme
-      token.host = host
-      token.path = path
-      token.body = authorizationtokenBody
+      self.token.scheme = scheme
+      self.token.host = host
+      self.token.path = path
+      self.token.body = authorizationtokenBody
       
       try await token.authorizationcodegrantFlow(req: req, body: authorizationtokenBody)
       return Response(status: .ok)
@@ -88,15 +92,19 @@ extension ImperialService {
     app.get(authenticationpathComponents) { request -> Response in
       let authenticationtokenKey = "code"
       let requestqueryCode: String = try request.query.get(at: authenticationtokenKey)
-      let scheme = try flowURL.scheme.value(or: Abort(.notFound))
-      let host = try flowURL.host.value(or: Abort(.notFound))
-      let path = try flowURL.path
+      
+      guard
+        let scheme = self.flowURL.scheme,
+        let host = self.flowURL.host
+      else { throw Abort(.notFound) }
+      
+      let path = self.flowURL.path
       
       authorizationtokenBody.code = requestqueryCode
-      token.body = authorizationtokenBody
-      token.scheme = scheme
-      token.host = host
-      token.path = path
+      self.token.body = authorizationtokenBody
+      self.token.scheme = scheme
+      self.token.host = host
+      self.token.path = path
       
       try await token.refreshtokengrantFlow(req: req, body: authorizationtokenBody)
       return Response(status: .ok)

@@ -12,10 +12,10 @@ extension GenericImperialToken {
     let refreshtokenGrant = "refresh_token"
     
     guard
-      let clientID = body.clientID,
-      let clientSecret = body.clientSecret,
-      let redirectURI = body.redirectURI,
-      let code = body.code,
+      let _ = body.clientID,
+      let _ = body.clientSecret,
+      let _ = body.redirectURI,
+      let _ = body.code,
       let grantType = body.grantType,
       grantType == refreshtokenGrant,
       let scopeList = body.scope,
@@ -34,7 +34,7 @@ extension GenericImperialToken {
       self.body.codeItem,
       self.body.grantTypeItem ]
     
-    let url = try components.url.value(or: Abort(.notFound))
+    guard let url = components.url else { throw Abort(.notFound) }
     let urlString = url.absoluteString
     let uri = URI(string: urlString)
     let refreshtokenResponse = try await req.client.post(uri, beforeSend: { req in
@@ -42,7 +42,7 @@ extension GenericImperialToken {
       try req.content.encode(body)
     }).encodeResponse(for: req)
     
-    let refreshtokenresponsebodyData = try refreshtokenResponse.body.data.value(or: Abort(.notFound))
+    guard let refreshtokenresponsebodyData = refreshtokenResponse.body.data else { throw Abort(.notFound) }
     let refreshtokenBody = try JSONDecoder().decode(ImperialBody.self, from: refreshtokenresponsebodyData)
     return refreshtokenBody
   }
