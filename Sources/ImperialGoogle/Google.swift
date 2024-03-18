@@ -35,7 +35,7 @@ public class GoogleService: ImperialService {
    let authorizationURL = try GoogleService.authorizationURL()
    let refreshURL = try GoogleService.refreshURL()
    
-   let callback = { @Sendable (req: Request, body: ImperialBody) async throws in
+   let callback = { @Sendable (req: Request, body: ImperialToken) async throws in
      print("function") }
     
    try self.init(

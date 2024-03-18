@@ -5,13 +5,13 @@ public protocol GenericImperialService {
   var req: Request { get }
   var authURL: URL { get }
   var flowURL: URL { get }
-  var token: GenericImperialToken { get set }
+  var token: GenericImperialGrant { get set }
   
   init(
     req: Vapor.Request,
     authURL: URL,
     flowURL: URL,
-    token: GenericImperialToken
+    token: GenericImperialGrant
   )
 }
 
@@ -19,13 +19,13 @@ open class ImperialService: GenericImperialService {
   public var req: Vapor.Request
   public var authURL: URL
   public var flowURL: URL
-  public var token: GenericImperialToken
+  public var token: GenericImperialGrant
   
   public required init(
     req: Vapor.Request,
     authURL: URL,
     flowURL: URL,
-    token: GenericImperialToken
+    token: GenericImperialGrant
   ) {
     self.req = req
     self.authURL = authURL
@@ -41,7 +41,7 @@ open class ImperialService: GenericImperialService {
     clientID: String,
     clientSecret: String,
     redirectURI: String,
-    callback: @Sendable @escaping (Request, ImperialBody) async throws -> Void
+    callback: @Sendable @escaping (Request, ImperialToken) async throws -> Void
   ) throws {
     
     guard
@@ -51,7 +51,7 @@ open class ImperialService: GenericImperialService {
     
     let authPath = authURL.path
 
-    let token = ImperialToken(
+    let token = ImperialGrant(
       scheme: authScheme,
       host: authHost,
       path: authPath,
@@ -89,7 +89,7 @@ open class ImperialService: GenericImperialService {
       self.token.path = path
       self.token.body = authorizationtokenBody
       
-      try await self.token.authorizationcodegrantFlow(req: req, body: authorizationtokenBody)
+      try await self.token.authorizationcodeFlow(req: req, body: authorizationtokenBody)
       return Response(status: .ok)
     }
   }
@@ -120,7 +120,7 @@ open class ImperialService: GenericImperialService {
       self.token.host = host
       self.token.path = path
       
-      try await self.token.refreshtokengrantFlow(req: req, body: authorizationtokenBody)
+      try await self.token.refreshtokenFlow(req: req, body: authorizationtokenBody)
       return Response(status: .ok)
     }
   }
