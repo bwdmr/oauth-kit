@@ -5,9 +5,9 @@ import Vapor
 /// This approach is suitable for client and server applications that need long-lived access to resources.
 /// ex.: Applications with long sessions or access to resources even when the authority is not available.
  
-extension GenericImperialToken {
+extension ImperialToken {
   
-  mutating private func refreshtokenGrant(req: Request, body: ImperialBody) async throws -> ImperialBody {
+  func refreshtokenGrant(req: Request, body: ImperialBody) async throws -> ImperialBody {
     let refreshtokenScope = "offline_access"
     let refreshtokenGrant = "refresh_token"
     
@@ -47,7 +47,7 @@ extension GenericImperialToken {
     return refreshtokenBody
   }
   
-  mutating public func refreshtokengrantFlow(req: Request, body: ImperialBody) async throws {
+  public func refreshtokengrantFlow(req: Request, body: ImperialBody) async throws {
     let accesstokenBody = try await authorizationcodeGrant(req: req, body: body)
     self.body = accesstokenBody
     let refreshtokenBody = try await refreshtokenGrant(req: req, body: body)

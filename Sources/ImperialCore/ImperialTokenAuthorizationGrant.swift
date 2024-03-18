@@ -6,9 +6,9 @@ import Vapor
 /// or when the resource server doesn't support or want to issue refresh tokens.
 /// ex.: Federated Login or access to regulated and/or compliance requirement-related data.
 
-extension GenericImperialToken {
+extension ImperialToken {
   
-  mutating private func authorizationcodeGrant(req: Request, body: ImperialBody) async throws -> ImperialBody {
+  func authorizationcodeGrant(req: Request, body: ImperialBody) async throws -> ImperialBody {
     let authorizationcodeGrant = "authorization_code"
     
     guard
@@ -44,7 +44,7 @@ extension GenericImperialToken {
     return accesstokenBody
   }
 
-  mutating public func authorizationcodegrantFlow(req: Request, body: ImperialBody) async throws {
+  public func authorizationcodegrantFlow(req: Request, body: ImperialBody) async throws {
     let accesstokenBody = try await authorizationcodeGrant(req: req, body: body)
     try await callback(req: req, body: accesstokenBody)
   }
