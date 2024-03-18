@@ -1,43 +1,46 @@
 import Vapor
 
 
+
 public protocol GenericImperialService {
   var req: Request { get }
-  var authURL: URL { get }
-  var flowURL: URL { get }
+  var preflightURL: URL { get }
+  var grantURL: URL { get }
   var token: GenericImperialGrant { get set }
   
   init(
     req: Vapor.Request,
-    authURL: URL,
-    flowURL: URL,
+    preflightURL: URL,
+    grantURL: URL,
     token: GenericImperialGrant
   )
 }
 
+
+
 open class ImperialService: GenericImperialService {
   public var req: Vapor.Request
-  public var authURL: URL
-  public var flowURL: URL
+  public var preflightURL: URL
+  public var grantURL: URL
   public var token: GenericImperialGrant
   
   public required init(
     req: Vapor.Request,
-    authURL: URL,
-    flowURL: URL,
+    preflightURL: URL,
+    grantURL: URL,
     token: GenericImperialGrant
   ) {
     self.req = req
-    self.authURL = authURL
-    self.flowURL = flowURL
+    self.preflightURL = preflightURL
+    self.grantURL = grantURL
     self.token = token
   }
   
   
   public convenience init(
     req: Vapor.Request,
-    authURL: URL,
-    flowURL: URL,
+    preflightURL: URL,
+    grantURL: URL,
     clientID: String,
     clientSecret: String,
     redirectURI: String,
@@ -45,22 +48,22 @@ open class ImperialService: GenericImperialService {
   ) throws {
     
     guard
-      let authScheme = authURL.scheme,
-      let authHost = authURL.host
+      let preflightScheme = preflightURL.scheme,
+      let preflightHost = preflightURL.host
     else { throw Abort(.notFound) }
     
-    let authPath = authURL.path
+    let preflightPath = preflightURL.path
 
     let token = ImperialGrant(
-      scheme: authScheme,
-      host: authHost,
-      path: authPath,
+      scheme: preflightScheme,
+      host: preflightHost,
+      path: preflightPath,
       clientID: clientID,
       clientSecret: clientSecret,
       redirectURI: redirectURI,
       callback: callback )
     
-    self.init(req: req, authURL: authURL, flowURL: flowURL, token: token)
+    self.init(req: req, preflightURL: preflightURL, grantURL: grantURL, token: token)
   }
   
   
@@ -77,11 +80,11 @@ open class ImperialService: GenericImperialService {
       let requestqueryCode: String = try request.query.get(at: authorizationtokenKey)
       
       guard
-        let scheme = self.authURL.scheme,
-        let host = self.authURL.host
+        let scheme = self.preflightURL.scheme,
+        let host = self.preflightURL.host
       else { throw Abort(.notFound) }
       
-      let path = self.authURL.path
+      let path = self.preflightURL.path
       
       authorizationtokenBody.code = requestqueryCode
       self.token.scheme = scheme
@@ -108,11 +111,11 @@ open class ImperialService: GenericImperialService {
       let requestqueryCode: String = try request.query.get(at: authenticationtokenKey)
       
       guard
-        let scheme = self.flowURL.scheme,
-        let host = self.flowURL.host
+        let scheme = self.grantURL.scheme,
+        let host = self.grantURL.host
       else { throw Abort(.notFound) }
       
-      let path = self.flowURL.path
+      let path = self.grantURL.path
       
       authorizationtokenBody.code = requestqueryCode
       self.token.body = authorizationtokenBody
