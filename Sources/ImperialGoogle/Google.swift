@@ -16,13 +16,23 @@ extension ImperialFactory {
 
 
 public class GoogleService: ImperialService {
-  static public func authorizationURL() throws -> URL {
-    guard let url = URL(string: "hellow world") else { throw Abort(.notFound) }
+  static public func preflightURL() throws -> URL {
+    var urlComponents = URLComponents()
+    urlComponents.scheme = "https"
+    urlComponents.host = "accounts.google.com"
+    urlComponents.path = "/o/oauth2/auth"
+    
+    guard let url = urlComponents.url else { throw Abort(.notFound) }
     return url
   }
   
-  static public func refreshURL() throws -> URL {
-    guard let url = URL(string: "hellow world") else { throw Abort(.notFound) }
+  static public func authorizationgrantURL() throws -> URL {
+    var urlComponents = URLComponents()
+    urlComponents.scheme = "https"
+    urlComponents.host = "oauth2.googleapis.com"
+    urlComponents.path = "/token"
+    
+    guard let url = urlComponents.url else { throw Abort(.notFound) }
     return url
   }
   
@@ -32,16 +42,16 @@ public class GoogleService: ImperialService {
     clientSecret: String,
     redirectURI: String
  ) throws {
-   let authorizationURL = try GoogleService.authorizationURL()
-   let refreshURL = try GoogleService.refreshURL()
+   let preflightURL = try GoogleService.preflightURL()
+   let authorizationgrantURL = try GoogleService.authorizationgrantURL()
    
    let callback = { @Sendable (req: Request, body: ImperialToken) async throws in
      print("function") }
     
    try self.init(
     req: req,
-    authURL: authorizationURL,
-    flowURL: refreshURL,
+    preflightURL: preflightURL,
+    grantURL: authorizationgrantURL,
     clientID: clientID,
     clientSecret: clientSecret,
     redirectURI: redirectURI,
