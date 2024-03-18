@@ -10,8 +10,8 @@ public struct ImperialID: Hashable, Codable, Sendable {
 
 
 public final class ImperialRegistry {
-  private let app: Application
-  private var imperialservices: [ImperialID: ((Request) -> ImperialService)]
+  public let app: Application
+  public var imperialservices: [ImperialID: ((Request) -> ImperialService)]
   
   init(_ app: Application) {
     self.app = app
