@@ -80,8 +80,8 @@ open class ImperialService: GenericImperialService {
     guard let redirectURI = authorizationtokenBody.redirectURI
     else { throw Abort(.notFound) }
     
-    let authorizationpathComponents = redirectURI.pathComponents
-    app.get(authorizationpathComponents) { request -> Response in
+    let redirecturipathComponents = redirectURI.pathComponents
+    app.get(redirecturipathComponents) { request -> Response in
       let authorizationtokenKey = "code"
       let requestqueryCode: String = try request.query.get(at: authorizationtokenKey)
       
