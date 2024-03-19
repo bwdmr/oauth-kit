@@ -40,7 +40,10 @@ public class GoogleService: ImperialService {
     req: Request,
     clientID: String,
     clientSecret: String,
-    redirectURI: String
+    grantType: String,
+    redirectURI: String,
+    responseType: String,
+    scope: [String]
  ) throws {
    let preflightURL = try GoogleService.preflightURL()
    let authorizationgrantURL = try GoogleService.authorizationgrantURL()
@@ -54,7 +57,10 @@ public class GoogleService: ImperialService {
     grantURL: authorizationgrantURL,
     clientID: clientID,
     clientSecret: clientSecret,
+    grantType: grantType,
     redirectURI: redirectURI,
+    responseType: responseType,
+    scope: scope,
     callback: callback)
   }
 }

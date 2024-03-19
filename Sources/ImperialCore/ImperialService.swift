@@ -43,8 +43,11 @@ open class ImperialService: GenericImperialService {
     grantURL: URL,
     clientID: String,
     clientSecret: String,
+    grantType: String,
     redirectURI: String,
-    callback: @Sendable @escaping (Request, ImperialToken) async throws -> Void
+    responseType: String,
+    scope: [String],
+    callback: (@Sendable (Request, ImperialToken) async throws -> Void)? = nil
   ) throws {
     
     guard
@@ -60,7 +63,10 @@ open class ImperialService: GenericImperialService {
       path: preflightPath,
       clientID: clientID,
       clientSecret: clientSecret,
+      grantType: grantType,
       redirectURI: redirectURI,
+      responseType: responseType,
+      scope: scope,
       callback: callback )
     
     self.init(req: req, preflightURL: preflightURL, grantURL: grantURL, token: token)

@@ -6,14 +6,14 @@ public protocol GenericImperialGrant {
   var host: String { get set }
   var path: String { get set }
   var body: ImperialToken { get set }
-  var handler: @Sendable (Request, ImperialToken) async throws -> Void { get set }
+  var handler: (@Sendable (Request, ImperialToken) async throws -> Void)? { get set }
   
   init(
     scheme: String,
     host: String,
     path: String,
     body: ImperialToken,
-    handler: @Sendable @escaping (Request, ImperialToken) async throws -> Void
+    handler: (@Sendable (Request, ImperialToken) async throws -> Void)?
   )
   
   mutating func authorizationcodeFlow(req: Request, body: ImperialToken) async throws
@@ -25,14 +25,14 @@ open class ImperialGrant: GenericImperialGrant {
   public var host: String
   public var path: String
   public var body: ImperialToken
-  public var handler: @Sendable (Vapor.Request, ImperialToken) async throws -> Void
+  public var handler: (@Sendable (Vapor.Request, ImperialToken) async throws -> Void)?
   
   public required init(
     scheme: String,
     host: String,
     path: String,
     body: ImperialToken,
-    handler: @Sendable @escaping (Vapor.Request, ImperialToken) async throws -> Void
+    handler: (@Sendable (Vapor.Request, ImperialToken) async throws -> Void)?
   ) {
     self.scheme = scheme
     self.host = host
@@ -43,7 +43,10 @@ open class ImperialGrant: GenericImperialGrant {
   
   func callback(req: Request, body: ImperialToken) async throws {
     req.set(body)
-    return try await self.handler(req, body)
+    
+    if let handler = handler {
+      try await handler(req, body)
+    }
   }
 }
 
@@ -54,13 +57,19 @@ extension ImperialGrant {
     path: String,
     clientID: String,
     clientSecret: String,
+    grantType: String,
     redirectURI: String,
-    callback: @Sendable @escaping (Request, ImperialToken) async throws -> Void
+    responseType: String,
+    scope: [String],
+    callback: (@Sendable (Request, ImperialToken) async throws -> Void)?
   ) {
     let imperialtokenBody = ImperialToken(
       clientID: clientID,
       clientSecret: clientSecret,
-      redirectURI: redirectURI )
+      grantType: grantType,
+      redirectURI: redirectURI,
+      responseType: responseType,
+      scope: scope)
     
     self.init(
       scheme: scheme,

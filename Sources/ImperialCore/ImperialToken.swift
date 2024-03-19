@@ -8,10 +8,12 @@ public protocol GenericImperialToken: Sendable, Codable, Content {
   var code: String? { get set }
   var error: String? { get set }
   var grantType: String? { get set }
+  var includegrantedScopes: String? { get set }
   var redirectURI: String? { get set }
   var refreshToken: String? { get set }
   var responseType: String? { get set }
   var scope: [String]? { get set }
+  var state: String? { get set }
 }
 
 
@@ -34,6 +36,9 @@ extension GenericImperialToken {
   public var grantTypeItem: URLQueryItem {
     .init(name: "grant_type", value: self.grantType) }
   
+  public var includegrantedScopesItem: URLQueryItem {
+    .init(name: "include_granted_scopes", value: self.includegrantedScopes) }
+  
   public var redirectURIItem: URLQueryItem {
     .init(name: "redirect_uri", value: self.redirectURI) }
   
@@ -45,6 +50,9 @@ extension GenericImperialToken {
   
   public var scopeItem: URLQueryItem {
     .init(name: "scope", value: self.scope?.joined(separator: " ")) }
+  
+  public var state: URLQueryItem {
+    .init(name: "state", value: self.state) }
 }
 
 
@@ -55,10 +63,12 @@ public struct ImperialToken: GenericImperialToken {
   public var code: String?
   public var error: String?
   public var grantType: String?
+  public var includegrantedScopes: String?
   public var redirectURI: String?
   public var refreshToken: String?
   public var responseType: String?
   public var scope: [String]?
+  public var state: String?
   
   private enum CodingKeys: String, CodingKey {
     case accessToken = "access_token"
@@ -67,10 +77,12 @@ public struct ImperialToken: GenericImperialToken {
     case code = "code"
     case error = "error"
     case grantType = "grant_type"
+    case includegrantedScopes = "include_granted_scopes"
     case redirectURI = "redirect_uri"
     case refreshToken = "refresh_token"
     case responseType = "response_type"
     case scope = "scope"
+    case state = "state"
   }
 }
 
