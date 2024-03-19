@@ -19,8 +19,8 @@ public class GoogleService: ImperialService {
   static public func preflightURL() throws -> URL {
     var urlComponents = URLComponents()
     urlComponents.scheme = "https"
-    urlComponents.host = "accounts.google.com"
-    urlComponents.path = "/o/oauth2/auth"
+    urlComponents.host = "oauth2.googleapis.com"
+    urlComponents.path = "/token"
     
     guard let url = urlComponents.url else { throw Abort(.notFound) }
     return url
