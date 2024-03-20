@@ -2,12 +2,12 @@ import Vapor
 import ImperialCore
 
 extension ImperialID {
-  static let google = ImperialID("google")
+  public static let google = ImperialID("google")
 }
 
 
 extension ImperialFactory {
-  var google: ImperialService {
+  public var google: ImperialService {
     guard let result = make(.google) as? ImperialService else {
       fatalError("Google Registry is not configured") }
     return result
