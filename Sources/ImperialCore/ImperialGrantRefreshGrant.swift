@@ -48,8 +48,6 @@ extension ImperialGrant {
   }
   
   public func refreshtokenFlow(req: Request, body: ImperialToken) async throws {
-    let accesstokenBody = try await authorizationCode(req: req, body: body)
-    self.body = accesstokenBody
     let refreshtokenBody = try await refreshToken(req: req, body: body)
     try await callback(req: req, body: refreshtokenBody)
   }

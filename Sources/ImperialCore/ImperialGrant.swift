@@ -16,9 +16,12 @@ public protocol GenericImperialGrant {
     handler: (@Sendable (Request, ImperialToken) async throws -> Void)?
   )
   
-  mutating func authorizationcodeFlow(req: Request, body: ImperialToken) async throws
+  mutating func authorizationtokenFlow(req: Request, body: ImperialToken) async throws
   mutating func refreshtokenFlow(req: Request, body: ImperialToken) async throws
+  mutating func revoketokenFlow(req: Request, body: ImperialToken) async throws
 }
+
+
 
 open class ImperialGrant: GenericImperialGrant {
   public var scheme: String

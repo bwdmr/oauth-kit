@@ -98,38 +98,7 @@ open class ImperialService: GenericImperialService {
       self.token.path = path
       self.token.body = authorizationtokenBody
       
-      try await self.token.authorizationcodeFlow(req: req, body: authorizationtokenBody)
-      return Response(status: .ok)
-    }
-  }
-
-  
-  func configurerefreshgrantRoute(on req: Request) throws {
-    let app = req.application
-    var authorizationtokenBody = token.body
-    
-    guard let redirectURI = authorizationtokenBody.redirectURI
-    else { throw Abort(.notFound) }
-    
-    let authenticationpathComponents = redirectURI.pathComponents
-    app.get(authenticationpathComponents) { request -> Response in
-      let authenticationtokenKey = "code"
-      let requestqueryCode: String = try request.query.get(at: authenticationtokenKey)
-      
-      guard
-        let scheme = self.grantURL.scheme,
-        let host = self.grantURL.host
-      else { throw Abort(.notFound) }
-      
-      let path = self.grantURL.path
-      
-      authorizationtokenBody.code = requestqueryCode
-      self.token.body = authorizationtokenBody
-      self.token.scheme = scheme
-      self.token.host = host
-      self.token.path = path
-      
-      try await self.token.refreshtokenFlow(req: req, body: authorizationtokenBody)
+      try await self.token.authorizationtokenFlow(req: req, body: authorizationtokenBody)
       return Response(status: .ok)
     }
   }

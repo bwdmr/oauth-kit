@@ -44,7 +44,7 @@ extension ImperialGrant {
     return accesstokenBody
   }
 
-  public func authorizationcodeFlow(req: Request, body: ImperialToken) async throws {
+  public func authorizationtokenFlow(req: Request, body: ImperialToken) async throws {
     let accesstokenBody = try await authorizationCode(req: req, body: body)
     try await callback(req: req, body: accesstokenBody)
   }
