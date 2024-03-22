@@ -20,17 +20,8 @@ extension ImperialFactory {
 
 
 public class GoogleService: ImperialService {
-  static public func preflightURL() throws -> URL {
-    var urlComponents = URLComponents()
-    urlComponents.scheme = "https"
-    urlComponents.host = "oauth2.googleapis.com"
-    urlComponents.path = "/token"
-    
-    guard let url = urlComponents.url else { throw Abort(.notFound) }
-    return url
-  }
-  
-  static public func authorizationgrantURL() throws -> URL {
+
+  static public func googleserviceURL() throws -> URL {
     var urlComponents = URLComponents()
     urlComponents.scheme = "https"
     urlComponents.host = "oauth2.googleapis.com"
@@ -49,16 +40,14 @@ public class GoogleService: ImperialService {
     responseType: String,
     scope: [String]
  ) throws {
-   let preflightURL = try GoogleService.preflightURL()
-   let authorizationgrantURL = try GoogleService.authorizationgrantURL()
+   let googleserviceURL = try GoogleService.googleserviceURL()
    
    let callback = { @Sendable (req: Request, body: ImperialToken) async throws in
      print("function") }
     
    try self.init(
     req: req,
-    preflightURL: preflightURL,
-    grantURL: authorizationgrantURL,
+    url: googleserviceURL,
     clientID: clientID,
     clientSecret: clientSecret,
     grantType: grantType,
