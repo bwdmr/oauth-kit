@@ -14,6 +14,8 @@ public protocol GenericImperialToken: Sendable, Codable, Content {
   var responseType: String? { get set }
   var scope: [String]? { get set }
   var state: String? { get set }
+  var token: String? { get set }
+  var tokenType: String? { get set }
 }
 
 
@@ -51,8 +53,14 @@ extension GenericImperialToken {
   public var scopeItem: URLQueryItem {
     .init(name: "scope", value: self.scope?.joined(separator: " ")) }
   
-  public var state: URLQueryItem {
+  public var stateItem: URLQueryItem {
     .init(name: "state", value: self.state) }
+  
+  public var tokenItem: URLQueryItem {
+    .init(name: "token", value: self.token) }
+  
+  public var tokentypeItem: URLQueryItem {
+    .init(name: "token_type", value: self.tokenType) }
 }
 
 
@@ -69,6 +77,8 @@ public struct ImperialToken: GenericImperialToken {
   public var responseType: String?
   public var scope: [String]?
   public var state: String?
+  public var token: String?
+  public var tokenType: String?
   
   private enum CodingKeys: String, CodingKey {
     case accessToken = "access_token"
@@ -83,6 +93,8 @@ public struct ImperialToken: GenericImperialToken {
     case responseType = "response_type"
     case scope = "scope"
     case state = "state"
+    case token = "token"
+    case tokenType = "token_type"
   }
 }
 
