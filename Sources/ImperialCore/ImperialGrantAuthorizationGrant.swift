@@ -1,6 +1,8 @@
 /// This approach is suitable for client applications that don't need long-lived access to resources
 /// or when the resource server doesn't support or want to issue refresh tokens.
 /// ex.: Federated Login or access to regulated and/or compliance requirement-related data.
+/// See Also:
+/// - [Authorization Flow](https://developers.google.com/identity/protocols/oauth2/web-server#httprest_3)
 import Vapor
 extension ImperialGrant {
   

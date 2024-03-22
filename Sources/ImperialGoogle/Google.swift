@@ -1,5 +1,9 @@
+/// - See Also:
+/// [Access Flow](https://developers.google.com/identity/protocols/oauth2/javascript-implicit-flow#oauth-2.0-endpoints)
+/// [Authorization Flow](https://developers.google.com/identity/protocols/oauth2/web-server#httprest_1)
 import Vapor
 import ImperialCore
+
 
 extension ImperialID {
   public static let google = ImperialID("google")
