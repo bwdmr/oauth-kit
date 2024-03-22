@@ -40,7 +40,7 @@ public class GoogleService: ImperialService {
     req: Request,
     clientID: String,
     clientSecret: String,
-    grantType: String,
+    grantType: String? = nil,
     redirectURI: String,
     responseType: String,
     scope: [String]

@@ -1,25 +1,17 @@
-import Vapor
-
-
-
 /// This approach is suitable for client and server applications that need long-lived access to resources.
 /// ex.: Applications with long sessions or access to resources even when the authority is not available.
- 
+import Vapor
 extension ImperialGrant {
   
   func refreshToken(req: Request, body: ImperialToken) async throws -> ImperialToken {
-    let refreshtokengrantName = "refresh_token"
-    let refreshtokenScope = "offline_access"
+    let refreshtokengranttypeName = "refresh_token"
+    let grantType = body.grantType ?? refreshtokengranttypeName
     
     guard
       let _ = body.clientID,
       let _ = body.clientSecret,
-      let _ = body.redirectURI,
-      let _ = body.code,
-      let grantType = body.grantType,
-      grantType == refreshtokengrantName,
-      let scopeList = body.scope,
-      scopeList.contains(refreshtokenScope)
+      let _ = body.refreshToken,
+      grantType == refreshtokengranttypeName
     else { throw Abort(.internalServerError) }
     
     var components = URLComponents()
@@ -29,10 +21,8 @@ extension ImperialGrant {
     components.queryItems = [
       self.body.clientIDItem,
       self.body.clientSecretItem,
-      self.body.redirectURIItem,
-      self.body.refreshTokenItem,
-      self.body.codeItem,
-      self.body.grantTypeItem ]
+      self.body.grantTypeItem,
+      self.body.refreshTokenItem ]
     
     guard let url = components.url else { throw Abort(.notFound) }
     let urlString = url.absoluteString

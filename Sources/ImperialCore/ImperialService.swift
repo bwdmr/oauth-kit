@@ -1,7 +1,6 @@
 import Vapor
 
 
-
 public protocol GenericImperialService {
   var req: Request { get }
   var preflightURL: URL { get }
@@ -15,7 +14,6 @@ public protocol GenericImperialService {
     token: GenericImperialGrant
   )
 }
-
 
 
 open class ImperialService: GenericImperialService {
@@ -36,14 +34,13 @@ open class ImperialService: GenericImperialService {
     self.token = token
   }
   
-  
   public convenience init(
     req: Vapor.Request,
     preflightURL: URL,
     grantURL: URL,
     clientID: String,
     clientSecret: String,
-    grantType: String,
+    grantType: String? = nil,
     redirectURI: String,
     responseType: String,
     scope: [String],

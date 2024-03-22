@@ -53,14 +53,17 @@ open class ImperialGrant: GenericImperialGrant {
   }
 }
 
+
+
 extension ImperialGrant {
+  
   convenience init(
     scheme: String,
     host: String,
     path: String,
     clientID: String,
     clientSecret: String,
-    grantType: String,
+    grantType: String? = nil,
     redirectURI: String,
     responseType: String,
     scope: [String],
