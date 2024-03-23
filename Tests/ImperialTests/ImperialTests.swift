@@ -1,5 +1,5 @@
 import XCTest
-@testable import ImperialCore
+@testable import Imperial
 
 final class ImperialTests: XCTestCase {
     func testExample() throws {

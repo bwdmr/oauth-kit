@@ -31,7 +31,7 @@ extension ImperialService {
     else { throw Abort(.notFound) }
     let path = url.path
 
-    let authorizationGrant = {(code: String) -> ImperialGrant in
+    let authorizationGrant = { @Sendable (code: String) -> ImperialGrant in
       AuthorizationGrant(
         scheme: scheme,
         host: host,
@@ -43,7 +43,7 @@ extension ImperialService {
         redirectURI: redirectURI,
         callback: callback )}
     
-    let refreshGrant = {(refreshToken: String) -> ImperialGrant in
+    let refreshGrant = { @Sendable (refreshToken: String) -> ImperialGrant in
       RefreshGrant(
         scheme: scheme,
         host: host, 
@@ -54,8 +54,8 @@ extension ImperialService {
         refreshToken: refreshToken,
         callback: callback )}
     
-    let revokeGrant = {(token: String) -> ImperialGrant in
-      RevokeGrant( 
+    let revokeGrant = { @Sendable (token: String) -> ImperialGrant in
+      RevokeGrant(
         scheme: scheme,
         host: host,
         path: path,

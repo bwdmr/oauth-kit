@@ -2,7 +2,7 @@
 /// [Access Flow](https://developers.google.com/identity/protocols/oauth2/javascript-implicit-flow#oauth-2.0-endpoints)
 /// [Authorization Flow](https://developers.google.com/identity/protocols/oauth2/web-server#httprest_1)
 import Vapor
-import ImperialCore
+import Imperial
 
 
 extension ImperialID {
@@ -27,13 +27,12 @@ public struct GoogleService: ImperialService {
   public init(
     req: Vapor.Request,
     url: URL,
-    grants: [String : @Sendable (String) -> (ImperialCore.ImperialGrant)]
+    grants: [String : @Sendable (String) -> (ImperialGrant)]
   ) {
     self.req = req
     self.url = url
     self.grants = grants
   }
-  
   
   static public func googleserviceURL() throws -> URL {
     var urlComponents = URLComponents()
