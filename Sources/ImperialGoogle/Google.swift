@@ -12,15 +12,29 @@ extension ImperialID {
 
 extension ImperialFactory {
   public var google: ImperialService {
-    guard let result = make(.google) as? ImperialService else {
+    guard let result = make(.google) as? (any ImperialService) else {
       fatalError("Google Registry is not configured") }
     return result
   }
 }
 
 
-public class GoogleService: ImperialService {
-
+public struct GoogleService: ImperialService {
+  public var req: Vapor.Request
+  public var url: URL
+  public var grants: [String : @Sendable (String) -> ImperialGrant]
+  
+  public init(
+    req: Vapor.Request,
+    url: URL,
+    grants: [String : @Sendable (String) -> (ImperialCore.ImperialGrant)]
+  ) {
+    self.req = req
+    self.url = url
+    self.grants = grants
+  }
+  
+  
   static public func googleserviceURL() throws -> URL {
     var urlComponents = URLComponents()
     urlComponents.scheme = "https"
@@ -31,29 +45,31 @@ public class GoogleService: ImperialService {
     return url
   }
   
-  convenience init?(
-    req: Request,
-    clientID: String,
-    clientSecret: String,
-    grantType: String? = nil,
-    redirectURI: String,
-    responseType: String,
-    scope: [String]
- ) throws {
-   let googleserviceURL = try GoogleService.googleserviceURL()
-   
-   let callback = { @Sendable (req: Request, body: ImperialToken) async throws in
-     print("function") }
-    
-   try self.init(
-    req: req,
-    url: googleserviceURL,
-    clientID: clientID,
-    clientSecret: clientSecret,
-    grantType: grantType,
-    redirectURI: redirectURI,
-    responseType: responseType,
-    scope: scope,
-    callback: callback)
-  }
+//  init(
+//    req: Request,
+//    url: URL,
+//    clientID: String,
+//    clientSecret: String,
+//    grantType: String? = nil,
+//    redirectURI: String,
+//    responseType: String,
+//    scope: [String],
+//    callback: (@Sendable (Request, ImperialToken) async throws -> Void)?
+// ) throws {
+//   let googleserviceURL = try GoogleService.googleserviceURL()
+//   
+//   let callback = { @Sendable (req: Request, body: ImperialToken) async throws in
+//     print("function") }
+//    
+//   try self.init(
+//    req: req,
+//    url: googleserviceURL,
+//    clientID: clientID,
+//    clientSecret: clientSecret,
+//    grantType: grantType,
+//    redirectURI: redirectURI,
+//    responseType: responseType,
+//    scope: scope,
+//    callback: callback)
+//  }
 }

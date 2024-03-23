@@ -1,9 +1,60 @@
 /// See Also:
 /// - [Revoke Flow](https://developers.google.com/identity/protocols/oauth2/web-server#httprest_3)
 import Vapor
-extension ImperialGrant {
+
+
+public struct RevokeGrant: ImperialGrant, ImperialGrantCache {
+  public var scheme: String
+  public var host: String
+  public var path: String
+  public var body: ImperialToken
+  public var handler: (@Sendable (Vapor.Request, ImperialToken) async throws -> Void)?
   
-  func revokeToken(req: Request, body: ImperialToken) async throws -> ImperialToken {
+  private enum CodingKeys: String, CodingKey {
+    case scheme = "scheme"
+    case host = "host"
+    case path = "path"
+    case body = "body"
+  }
+ 
+  public init(
+    scheme: String,
+    host: String,
+    path: String,
+    body: ImperialToken, 
+    handler: (@Sendable (Vapor.Request, ImperialToken) async throws -> Void)? = nil
+  ) {
+    self.scheme = scheme
+    self.host = host
+    self.path = path
+    self.body = body
+    self.handler = handler
+  }
+  
+  public init(
+    scheme: String,
+    host: String,
+    path: String,
+    token: String,
+    callback: (@Sendable (Vapor.Request, ImperialToken) async throws -> Void)? = nil
+  ) {
+    let revoketokenBody = ImperialToken(token: token)
+    self.init(scheme: scheme, host: host, path: path, body: revoketokenBody, handler: callback)
+  }
+
+  public struct RequestBody: Sendable, Codable {
+    public var token: String
+    
+    init(token: String){
+      self.token = token
+    }
+    
+    private enum CodingKeys: String, CodingKey {
+      case token = "token"
+    }
+  }
+  
+  public mutating func flow(req: Request, body: ImperialToken) async throws {
     guard
       let _ = body.token
     else { throw Abort(.internalServerError) }
@@ -23,12 +74,8 @@ extension ImperialGrant {
       try req.content.encode(body)
     }).encodeResponse(for: req)
     
-    let revoketokenresponsebodyData = ImperialToken()
-    return revoketokenresponsebodyData
-  }
-  
-  public func revoketokenFlow(req: Request, body: ImperialToken) async throws {
-    let revoketokenBody = try await revokeToken(req: req, body: body)
-    try await callback(req: req, body: revoketokenBody)
+    guard let refreshtokenresponsebodyData = refreshtokenResponse.body.data else { throw Abort(.notFound) }
+    let refreshtokenBody = try JSONDecoder().decode(ImperialToken.self, from: refreshtokenresponsebodyData)
+    try await callback(req: req, body: refreshtokenBody)
   }
 }
