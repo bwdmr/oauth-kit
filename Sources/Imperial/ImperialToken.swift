@@ -1,6 +1,8 @@
 import Vapor
 
 
+public protocol _ImperialToken: Sendable, Codable, Content {}
+
 public protocol GenericImperialToken: Sendable, Codable, Content {
   var accessToken: String? { get set }
   var clientID: String? { get set }
@@ -17,7 +19,6 @@ public protocol GenericImperialToken: Sendable, Codable, Content {
   var token: String? { get set }
   var tokenType: String? { get set }
 }
-
 
 extension GenericImperialToken {
   public var accessTokenItem: URLQueryItem {
@@ -101,10 +102,16 @@ public struct ImperialToken: GenericImperialToken {
 
 extension Request {
   
-  public func set<A>(_ instance: A)
+  public func approve<A>(_ instance: A)
   where A: GenericImperialToken
   {
     self.cache[A.self] = instance
+  }
+  
+  public func revoke<A>(_ type: A.Type = A.self)
+  where A: GenericImperialToken
+  {
+    self.cache[A.self] = nil
   }
   
   @discardableResult public func require<A>(_ type: A.Type = A.self) throws -> A

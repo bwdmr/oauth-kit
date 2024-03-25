@@ -36,7 +36,7 @@ public struct ImperialError: Error, @unchecked Sendable {
     fileprivate var reason: String?
     fileprivate var underlying: Error?
     fileprivate var identifier: String?
-    fileprivate var failedGrant: (any ImperialGrant)?
+    fileprivate var failedGrant: ImperialGrantable?
     
     init(errorType: ErrorType) {
       self.errorType = errorType
@@ -70,7 +70,7 @@ public struct ImperialError: Error, @unchecked Sendable {
     set { self.backing.identifier = newValue }
   }
   
-  public internal(set) var failedClaim: (any ImperialGrant)? {
+  public internal(set) var failedClaim: ImperialGrantable? {
     get { self.backing.failedGrant }
     set { self.backing.failedGrant = newValue }
   }
@@ -79,7 +79,7 @@ public struct ImperialError: Error, @unchecked Sendable {
     self.backing = .init(errorType: errorType)
   }
   
-  public static func redirecturiMismatch(failedClaim: (any ImperialGrant)?, reason: String) -> Self {
+  public static func redirecturiMismatch(failedClaim: ImperialGrantable?, reason: String) -> Self {
     var new = Self(errorType: .redirecturiMismatch)
     new.failedClaim = failedClaim
     new.reason = reason

@@ -2,7 +2,6 @@
 /// [Access Flow](https://developers.google.com/identity/protocols/oauth2/javascript-implicit-flow#oauth-2.0-endpoints)
 /// [Authorization Flow](https://developers.google.com/identity/protocols/oauth2/web-server#httprest_1)
 import Vapor
-import Imperial
 
 
 extension ImperialID {
@@ -19,21 +18,14 @@ extension ImperialFactory {
 }
 
 
+
+
 public struct GoogleService: ImperialService {
-  public var req: Vapor.Request
-  public var url: URL
-  public var grants: [String : @Sendable (String) -> ImperialGrant]
-  
-  public init(
-    req: Vapor.Request,
-    url: URL,
-    grants: [String : @Sendable (String) -> (ImperialGrant)]
-  ) {
-    self.req = req
-    self.url = url
-    self.grants = grants
+  static public var authorizationURL = { URLComponents()
+    self.url.scheme = "https"
+    self.url.host = "oauth"
   }
-  
+ 
   static public func googleserviceURL() throws -> URL {
     var urlComponents = URLComponents()
     urlComponents.scheme = "https"
@@ -43,6 +35,24 @@ public struct GoogleService: ImperialService {
     guard let url = urlComponents.url else { throw Abort(.notFound) }
     return url
   }
+  
+   
+  public var req: Vapor.Request
+  public var url: URL
+  public var grantor: Grantor
+  
+  public init(req: Vapor.Request, url: URL) {
+    
+    let grantor = CacheGrantable(
+      authorizeURL: <#T##URL#>,
+      refreshURL: <#T##URL#>,
+      revokeURL: <#T##URL#>)
+    
+    self.req = req
+    self.url = url
+    self.grantor = grantor
+  }
+  
   
 //  init(
 //    req: Request,
