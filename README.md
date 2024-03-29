@@ -1,4 +1,4 @@
-# Imperial
+# OAuth Kit
 
 
 
@@ -11,7 +11,7 @@ Define your service within your configuration and register it to your applicatio
 ```swift
 // configuration.swift
 
-app.imperialservices.register(.google) { req in 
+app.oauthservices.register(.google) { req in 
   let cacheGrantor = CacheGrantable<<#T##GoogleAccessToken#>>()
   let authorizationHandler = {(<#T##Request#>, <#T##GoogleAuthorizationToken#>) 
     cacheGrantor.approve(<#T##GoogleAuthoriztationToken#>) }
