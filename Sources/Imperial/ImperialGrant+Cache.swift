@@ -2,16 +2,14 @@ import Vapor
 
 
 
-public struct CacheGrantable<T: ImperialToken, U: ImperialToken>: Grantor {
+public struct CacheGrantable<T: ImperialToken>: Grantor {
 
-  @Sendable public func approve(req: Request, token: U?) async throws -> Void {
+  @Sendable public func approve(req: Request, token: T?) async throws -> Void {
     guard let token = token else { throw Abort(.notFound) }
     req.approve(token) }
   
-  @Sendable public func revoke(req: Request, token: U?) async throws -> Void {
-    guard let token = token else { throw Abort(.notFound) }
-    req.revoke(type(of: token))
-  }
+  @Sendable public func revoke(req: Request) async throws -> Void {
+    req.revoke(T.self) }
 }
 
 

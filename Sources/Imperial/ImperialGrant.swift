@@ -8,7 +8,7 @@ public protocol Grantor: Sendable {
   associatedtype T
   
   @Sendable func approve(req: Request, token: T?) async throws -> Void
-  @Sendable func revoke(req: Request, token: T?) async throws -> Void
+  @Sendable func revoke(req: Request) async throws -> Void
 }
 
 
