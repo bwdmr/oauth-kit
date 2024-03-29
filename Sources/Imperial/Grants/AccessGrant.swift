@@ -44,7 +44,7 @@ struct AccessGrant<
     return uri
   }
   
-  public func flow(req: Request, data: Data?) async throws {
+  public func grant(req: Request, data: Data?) async throws {
     guard let data = data else { throw Abort(.notFound)}
     let tokenBody = try JSONDecoder().decode(U.self, from: data)
     guard let handler else { throw Abort(.notFound) }

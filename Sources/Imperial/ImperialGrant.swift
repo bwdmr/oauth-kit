@@ -30,7 +30,7 @@ public protocol ImperialGrantable: Sendable, Grantable {
     handler: (@Sendable (Request, U?) async throws -> Void)? )
  
   @Sendable func generateURI(payload: T) throws -> URI
-  @Sendable func flow(req: Request, data: Data?) async throws -> Void
+  @Sendable func grant(req: Request, data: Data?) async throws -> Void
 }
  
 extension ImperialGrantable {

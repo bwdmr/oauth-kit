@@ -38,7 +38,7 @@ struct RevokeGrant<
   }
   
   
-  public func flow(req: Request, data: Data? = nil) async throws {
+  public func grant(req: Request, data: Data? = nil) async throws {
     guard let handler = handler else { throw Abort(.notFound) }
     try await handler(req, nil)
   }
