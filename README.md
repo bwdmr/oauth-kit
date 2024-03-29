@@ -12,17 +12,22 @@ Define your service within your configuration and register it to your applicatio
 // configuration.swift
 
 app.imperialservices.register(.google) { req in 
+  let cacheGrantor = CacheGrantable<<#T##GoogleAccessToken#>>()
+  let authorizationHandler = {(<#T##Request#>, <#T##GoogleAuthorizationToken#>) 
+    cacheGrantor.approve(<#T##GoogleAuthoriztationToken#>) }
+  let authorizationGrant = AuthorizationGrant<<#T##GoogleAuthorizationPayload#>, <#T##GoogleAuthorizationToken#>>(
+    name: "authorize",
+    scheme: "https",
+    host: "google.com",
+    path: "hasdas",
+    handler: authorizationHandler )
 
-    let googleService = GoogleService(
-  	req: <#T##Request#>, 
-	authURL: <#T##URL#>, 
-	flowURL: <#T##URL#>, 
-	clientID: <#T##String#>, 
-	clientSecret: <#T##String#>, 
-	redirectURI: <#T##String#>, 
-	callback: <#T##(Request, ImperialBody) -> Void#>
-    )
-    return googleService
+  let googleService = GoogleService(
+	  req: <#T##Request#>, 
+    grantor:  <#T##any Grantor#>,
+    grants: <#T##Dictionary<String, any ImperialGrantable>#>
+  )
+  return googleService
 }
 ```
 
