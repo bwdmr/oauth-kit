@@ -7,6 +7,7 @@ public struct ImperialError: Error, @unchecked Sendable {
   public struct ErrorType: Sendable, Hashable, CustomStringConvertible {
     
     enum Base: Sendable, Hashable {
+      case invalidBool
       case redirecturiMismatch
       case claimVerificationFailure
       case generic
@@ -17,13 +18,16 @@ public struct ImperialError: Error, @unchecked Sendable {
     private init(_ base: Base) {
       self.base = base
     }
-    
+   
+    public static let invalidBool = Self(.invalidBool)
     public static let redirecturiMismatch = Self(.redirecturiMismatch)
     public static let claimVerificationFailure = Self(.claimVerificationFailure)
     public static let generic = Self(.generic)
     
     public var description: String {
       switch self.base {
+      case .invalidBool:
+        "invalid_bool"
       case .claimVerificationFailure:
         "claim_verification_failure"
       case .redirecturiMismatch:
@@ -83,7 +87,16 @@ public struct ImperialError: Error, @unchecked Sendable {
   init(errorType: ErrorType) {
     self.backing = .init(errorType: errorType)
   }
+ 
   
+  ///
+  public static func invalidBool(_ name: String) -> Self {
+    var new = Self(errorType: .invalidBool)
+    new.name = name
+    return new
+  }
+  
+  ///
   public static func claimVerificationFailure(failedClaim: (any ImperialClaim)?, reason: String) -> Self {
     var new = Self(errorType: .claimVerificationFailure)
     new.failedClaim = failedClaim
@@ -91,6 +104,7 @@ public struct ImperialError: Error, @unchecked Sendable {
     return new
   }
   
+  ///
   public static func redirecturiMismatch(failedClaim: (any ImperialClaim)?, reason: String) -> Self {
     var new = Self(errorType: .redirecturiMismatch)
     new.failedClaim = failedClaim
@@ -98,6 +112,7 @@ public struct ImperialError: Error, @unchecked Sendable {
     return new
   }
   
+  ///
   public static func generic(identifier: String, reason: String) -> Self {
     var new = Self(errorType: .generic)
     new.identifier = identifier

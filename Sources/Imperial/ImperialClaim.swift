@@ -32,7 +32,6 @@ public protocol ImperialClaim: Codable, Sendable {
   init(value: Value)
 }
 
-
 public extension ImperialClaim where Value == String, Self: ExpressibleByStringLiteral {
   init(stringLiteral string: String) {
     self.init(value: string)
@@ -54,7 +53,6 @@ public extension ImperialClaim {
 
 
 public protocol ImperialUnixEpochClaim: ImperialClaim where Value == Date {}
-
 public extension ImperialUnixEpochClaim {
     /// See `Decodable`.
     init(from decoder: Decoder) throws {
@@ -71,18 +69,35 @@ public extension ImperialUnixEpochClaim {
 
 
 
-public protocol ImperialBooleanClaim: ImperialClaim where Value == Bool {}
-
+public protocol ImperialBooleanClaim: ImperialClaim where Value == Bool, Self: ExpressibleByBooleanLiteral {}
 public extension ImperialBooleanClaim {
-    /// See `Decodable`.
-    init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        try self.init(value: container.decode(Bool.self))
+  
+  init(value: Bool) {
+    self.init(value: value)
+  }
+  
+  init(stringLiteral value: String) {
+    let value = Bool(value) ?? false
+    self.init(value: value)
+  }
+  
+  init(booleanLiteral value: Bool) {
+    self.init(value: value)
+  }
+  
+  /// See `Decodable`.
+  init(from decoder: Decoder) throws {
+    let single = try decoder.singleValueContainer()
+    
+    do {
+      try self.init(value: single.decode(Bool.self))
+    } catch {
+      let str = try single.decode(String.self)
+      guard let bool = Bool(str) else {
+        throw ImperialError.invalidBool(str)
+      }
+      
+      self.init(value: bool)
     }
-
-    /// See `Encodable`.
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        try container.encode(self.value)
-    }
+  }
 }
