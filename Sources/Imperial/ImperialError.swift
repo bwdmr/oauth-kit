@@ -8,6 +8,7 @@ public struct ImperialError: Error, @unchecked Sendable {
     
     enum Base: Sendable, Hashable {
       case redirecturiMismatch
+      case claimVerificationFailure
       case generic
     }
     
@@ -18,9 +19,13 @@ public struct ImperialError: Error, @unchecked Sendable {
     }
     
     public static let redirecturiMismatch = Self(.redirecturiMismatch)
+    public static let claimVerificationFailure = Self(.claimVerificationFailure)
     public static let generic = Self(.generic)
+    
     public var description: String {
       switch self.base {
+      case .claimVerificationFailure:
+        "claim_verification_failure"
       case .redirecturiMismatch:
         "redirect_uri_mismatch"
       case .generic:
@@ -36,7 +41,7 @@ public struct ImperialError: Error, @unchecked Sendable {
     fileprivate var reason: String?
     fileprivate var underlying: Error?
     fileprivate var identifier: String?
-    fileprivate var failedGrant: ImperialGrantable?
+    fileprivate var failedGrant: (any ImperialClaim)?
     
     init(errorType: ErrorType) {
       self.errorType = errorType
@@ -70,7 +75,7 @@ public struct ImperialError: Error, @unchecked Sendable {
     set { self.backing.identifier = newValue }
   }
   
-  public internal(set) var failedClaim: ImperialGrantable? {
+  public internal(set) var failedClaim: (any ImperialClaim)? {
     get { self.backing.failedGrant }
     set { self.backing.failedGrant = newValue }
   }
@@ -79,7 +84,14 @@ public struct ImperialError: Error, @unchecked Sendable {
     self.backing = .init(errorType: errorType)
   }
   
-  public static func redirecturiMismatch(failedClaim: ImperialGrantable?, reason: String) -> Self {
+  public static func claimVerificationFailure(failedClaim: (any ImperialClaim)?, reason: String) -> Self {
+    var new = Self(errorType: .claimVerificationFailure)
+    new.failedClaim = failedClaim
+    new.reason = reason
+    return new
+  }
+  
+  public static func redirecturiMismatch(failedClaim: (any ImperialClaim)?, reason: String) -> Self {
     var new = Self(errorType: .redirecturiMismatch)
     new.failedClaim = failedClaim
     new.reason = reason
