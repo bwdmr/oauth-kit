@@ -23,6 +23,7 @@ public struct ImperialCodingKey: CodingKey, Hashable, Equatable, ExpressibleBySt
 }
 
 
+
 public protocol ImperialClaim: Codable, Sendable {
   associatedtype Value: Codable
   
@@ -38,7 +39,6 @@ public extension ImperialClaim where Value == String, Self: ExpressibleByStringL
   }
 }
 
-
 public extension ImperialClaim {
   init(from decoder: Decoder) throws {
     let single = try decoder.singleValueContainer()
@@ -52,19 +52,37 @@ public extension ImperialClaim {
 }
 
 
-public protocol ImperialUnixEpochClaim: ImperialClaim where Value == Date {}
-public extension ImperialUnixEpochClaim {
-    /// See `Decodable`.
-    init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        try self.init(value: container.decode(Date.self))
-    }
 
-    /// See `Encodable`.
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        try container.encode(self.value)
+public protocol ImperialIntegerClaim: ImperialClaim where Value == Int, Self: ExpressibleByIntegerLiteral {}
+public extension ImperialIntegerClaim {
+  
+  init(value: Int) {
+    self.init(value: value)
+  }
+  
+  init(stringLiteral value: String) {
+    let value = Int(value) ?? 0
+    self.init(value: value)
+  }
+  
+  init(integerLiteral value: Int) {
+    self.init(value: value)
+  }
+  
+  init(from decoder: Decoder) throws {
+    let single = try decoder.singleValueContainer()
+    
+    do {
+      try self.init(value: single.decode(Int.self))
+    } catch {
+      let str = try single.decode(String.self)
+      guard let int = Int(str) else {
+        throw ImperialError.invalidInt(str)
+      }
+      
+      self.init(value: int)
     }
+  }
 }
 
 
