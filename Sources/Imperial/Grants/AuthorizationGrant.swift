@@ -39,6 +39,36 @@ struct AuthorizationGrant<
         URLQueryItem(name: ScopeClaim.key.stringValue, value: scope.value)
       ]
       
+      if let accessType = payload.accessType {
+        let accessTypeItem = URLQueryItem(name: AccessTypeClaim.key.stringValue, value: accessType.value)
+        queryitemList.append(accessTypeItem) }
+      
+      if let state = payload.state {
+        let stateItem = URLQueryItem(name: StateClaim.key.stringValue, value: state.value)
+        queryitemList.append(stateItem) }
+      
+      if let includegrantedScopes = payload.includegrantedScopes {
+        let includegrantedScopesItem = URLQueryItem(
+          name: IncludeGrantedScopesClaim.key.stringValue,
+          value:  includegrantedScopes.value.description)
+        queryitemList.append(includegrantedScopesItem) }
+      
+      if let enablegranularConsent = payload.enablegranularConsent {
+        let enablegranularConsent = URLQueryItem(
+          name: EnableGranularConsentClaim.key.stringValue,
+          value: enablegranularConsent.value.description)
+        queryitemList.append(enablegranularConsent) }
+      
+      if let loginHint = payload.loginHint {
+        let loginHintItem = URLQueryItem(
+          name: LoginHintClaim.key.stringValue,
+          value: loginHint.value)
+        queryitemList.append(loginHintItem) }
+      
+      if let prompt = payload.prompt {
+        let promptItem = URLQueryItem(name: PromptClaim.key.stringValue, value: prompt.value)
+        queryitemList.append(promptItem) }
+      
       return queryitemList
     }()
     

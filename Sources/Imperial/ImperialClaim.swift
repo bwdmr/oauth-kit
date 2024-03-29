@@ -68,3 +68,21 @@ public extension ImperialUnixEpochClaim {
         try container.encode(self.value)
     }
 }
+
+
+
+public protocol ImperialBooleanClaim: ImperialClaim where Value == Bool {}
+
+public extension ImperialBooleanClaim {
+    /// See `Decodable`.
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        try self.init(value: container.decode(Bool.self))
+    }
+
+    /// See `Encodable`.
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.value)
+    }
+}
