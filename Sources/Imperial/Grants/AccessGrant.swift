@@ -1,13 +1,8 @@
-/// This approach is suitable for client applications that don't need long-lived access to resources
-/// or when the resource server doesn't support or want to issue refresh tokens.
-/// ex.: Federated Login or access to regulated and/or compliance requirement-related data.
-/// See Also:
-/// - [Authorization Flow](https://developers.google.com/identity/protocols/oauth2/web-server#httprest_3)
 import Vapor
 
 
 
-struct AuthorizationGrant<
+struct AccessGrant<
   T: ImperialToken,
   U: ImperialToken
 >: ImperialGrantable {
@@ -18,13 +13,13 @@ struct AuthorizationGrant<
   var path: String
   var handler: (@Sendable (Vapor.Request, U?) async throws -> Void)?
   
-  
   public func generateURI(payload: T) throws -> URI {
     guard
       let clientID = payload.clientID,
-      let redirectURI = payload.redirectURI,
-      let responseType = payload.responseType,
-      let scope = payload.scope
+      let clientSecret = payload.clientSecret,
+      let code = payload.code,
+      let grantType = payload.grantType,
+      let redirectURI = payload.redirectURI
     else { throw Abort(.internalServerError) }
     
     var components = URLComponents()
@@ -34,9 +29,10 @@ struct AuthorizationGrant<
     components.queryItems = {
       var queryitemList = [
         URLQueryItem(name: ClientIDClaim.key.stringValue, value: clientID.value),
-        URLQueryItem(name: RedirectURIClaim.key.stringValue, value: redirectURI.value),
-        URLQueryItem(name: ResponseTypeClaim.key.stringValue, value: responseType.value),
-        URLQueryItem(name: ScopeClaim.key.stringValue, value: scope.value)
+        URLQueryItem(name: ClientSecretClaim.key.stringValue, value: clientSecret.value),
+        URLQueryItem(name: CodeClaim.key.stringValue, value: code.value),
+        URLQueryItem(name: GrantTypeClaim.key.stringValue, value: grantType.value),
+        URLQueryItem(name: RedirectURIClaim.key.stringValue, value: redirectURI.value)
       ]
       
       return queryitemList
@@ -48,12 +44,11 @@ struct AuthorizationGrant<
     return uri
   }
   
-  
   public func flow(req: Request, data: Data?) async throws {
-    guard let data = data else { throw Abort(.notFound) }
+    guard let data = data else { throw Abort(.notFound)}
     let tokenBody = try JSONDecoder().decode(U.self, from: data)
-    
-    guard let handler = handler else { throw Abort(.notFound) }
+    guard let handler else { throw Abort(.notFound) }
     try await handler(req, tokenBody)
   }
 }
+  

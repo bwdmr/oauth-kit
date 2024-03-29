@@ -2,82 +2,87 @@ import Vapor
 
 
 
-public protocol CacheGrant: Grantor {
-  @Sendable func approve(req: Request, body: ImperialToken) async throws -> Void
-  @Sendable func revoke(req: Request, body: ImperialToken) async throws -> Void
+public struct CacheGrantable<T: ImperialToken, U: ImperialToken>: Grantor {
+
+  @Sendable public func approve(req: Request, token: U?) async throws -> Void {
+    guard let token = token else { throw Abort(.notFound) }
+    req.approve(token) }
+  
+  @Sendable public func revoke(req: Request, token: U?) async throws -> Void {
+    guard let token = token else { throw Abort(.notFound) }
+    req.revoke(type(of: token))
+  }
 }
 
 
-extension CacheGrant {
-  @Sendable public func approve(req: Request, body: ImperialToken) async throws -> Void {
-    req.approve(body)
+
+extension Request {
+  public func approve<A>(_ instance: A)
+  where A: ImperialToken
+  {
+    self.cache[A.self] = instance
   }
   
-  @Sendable public func revoke(req: Request, body: ImperialToken) async throws -> Void {
-    req.revoke(type(of: body))
+  public func revoke<A>(_ type: A.Type = A.self)
+  where A: ImperialToken
+  {
+    self.cache[A.self] = nil
   }
-}
-
-
-public struct CacheGrantable<
-  Authorize: AuthorizationGrant,
-  Refresh: RefreshGrant,
-  Revoke: RevokeGrant
->: CacheGrant {
-  public var grants: [String: Grantable]
   
-  init( 
-    authorizeURL: URL,
-    refreshURL: URL,
-    revokeURL: URL
-  ) async throws {
+  @discardableResult public func require<A>(_ type: A.Type = A.self) throws -> A
+  where A: ImperialToken
+  {
+    guard let a = self.get(A.self) else {
+      throw Abort(.unauthorized)
+    }
+    return a
+  }
+  
+  public func get<A>(_ type: A.Type = A.self) -> A?
+  where A: ImperialToken
+  {
+    return self.cache[A.self]
+  }
+  
+  public func has<A>(_ type: A.Type = A.self) -> Bool
+  where A: ImperialToken
+  {
+    return self.get(A.self) != nil
+  }
+  
+  private final class Cache {
+    private var storage: [ObjectIdentifier: Any]
     
-    guard
-      let authorizeScheme = authorizeURL.scheme,
-      let authorizeHost = authorizeURL.host
-    else { throw Abort(.internalServerError) }
+    init() { self.storage = [:] }
     
-    let authorizePath = authorizeURL.path
-    let authorizeGrant = Authorize(
-      scheme: authorizeScheme,
-      host: authorizeHost,
-      path: authorizePath,
-      handler: {@Sendable (req: Request,body: ImperialToken) async throws -> Void in
-        try await approve(req: req, body: body) })
+    internal subscript<A>(_ type: A.Type) -> A?
+    where A: ImperialToken
+    {
+      get { return storage[ObjectIdentifier(A.self)] as? A }
+      set { storage[ObjectIdentifier(A.self)] = newValue }
+    }
+  }
+  
+  private struct CacheKey: StorageKey {
+    typealias Value = Cache
+  }
+  
+  private var cache: Cache {
+    get {
+      if let existing = self.storage[CacheKey.self] {
+        return existing
+      }
+      
+      else {
+        let new = Cache()
+        self.storage[CacheKey.self] = new
+        return new
+      }
+    }
     
-    
-    guard
-      let refreshScheme = refreshURL.scheme,
-      let refreshHost = refreshURL.host
-    else { throw Abort(.internalServerError) }
-    
-    let refreshPath = refreshURL.path
-    let refreshGrant = Refresh(
-      scheme: refreshScheme,
-      host: refreshHost,
-      path: refreshPath,
-      handler: {@Sendable (req: Request,body: ImperialToken) async throws -> Void in
-        try await approve(req: req, body: body) })
-        
-    
-    guard
-      let revokeScheme = revokeURL.scheme,
-      let revokeHost = revokeURL.host
-    else { throw Abort(.internalServerError) }
-    
-    let revokePath = revokeURL.path
-    let revokeGrant = Revoke(
-      scheme: revokeScheme,
-      host: revokeHost,
-      path: revokePath,
-      handler: {@Sendable (req: Request,body: ImperialToken) async throws -> Void in
-        try await revoke(req: req, body: body) })
-    
-    
-    self.grants = [
-      "authorize": authorizeGrant,
-      "refresh": refreshGrant,
-      "revoke": revokeGrant
-    ]
+    set {
+      self.storage[CacheKey.self] = newValue
+    }
   }
 }
+
