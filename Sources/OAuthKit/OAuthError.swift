@@ -1,5 +1,4 @@
 import Foundation
-import Vapor
 
 
 /// OAuth error type
@@ -9,7 +8,9 @@ public struct OAuthError: Error, @unchecked Sendable {
     enum Base: Sendable, Hashable {
       case invalidBool
       case invalidInt
+      case invalidURL
       case redirecturiMismatch
+      case claimMissingRequiredMember
       case claimVerificationFailure
       case generic
     }
@@ -22,7 +23,9 @@ public struct OAuthError: Error, @unchecked Sendable {
   
     public static let invalidBool = Self(.invalidBool)
     public static let invalidInt = Self(.invalidInt)
+    public static let invalidURL = Self(.invalidURL)
     public static let redirecturiMismatch = Self(.redirecturiMismatch)
+    public static let claimMissingRequiredMember = Self(.claimMissingRequiredMember)
     public static let claimVerificationFailure = Self(.claimVerificationFailure)
     public static let generic = Self(.generic)
     
@@ -32,6 +35,10 @@ public struct OAuthError: Error, @unchecked Sendable {
         "invalid_bool"
       case .invalidInt:
         "invalid_int"
+      case .invalidURL:
+        "invalid_url"
+      case .claimMissingRequiredMember:
+        "claim_missing_required_member"
       case .claimVerificationFailure:
         "claim_verification_failure"
       case .redirecturiMismatch:
@@ -105,6 +112,23 @@ public struct OAuthError: Error, @unchecked Sendable {
   public static func invalidInt(_ name: String) -> Self {
     var new = Self(errorType: .invalidInt)
     new.name = name
+    return new
+  }
+  
+ 
+  ///
+  public static func invalidURL(_ name: String) -> Self {
+    var new = Self(errorType: .invalidURL)
+    new.name = name
+    return new
+  }
+  
+ 
+  ///
+  public static func claimMissingRequiredMember(failedClaim: (any OAuthClaim)?, reason: String) -> Self {
+    var new = Self(errorType: .claimMissingRequiredMember)
+    new.failedClaim = failedClaim
+    new.reason = reason
     return new
   }
   

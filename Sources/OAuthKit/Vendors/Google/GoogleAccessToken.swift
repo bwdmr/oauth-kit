@@ -1,8 +1,7 @@
-import Vapor
+import Foundation
 
 public struct GoogleAccessToken: OAuthToken {
-  
-  public enum CodingKeys: String, CodingKey {
+  enum CodingKeys: String, CodingKey {
     case accessToken = "access_token"
     case expiresIn = "expires_in"
     case refreshToken = "refresh_token"
@@ -14,7 +13,7 @@ public struct GoogleAccessToken: OAuthToken {
   
   public let expiresIn: ExpiresInClaim
   
-  public let refreshToken: RefreshTokenClaim
+  public let refreshToken: RefreshTokenClaim?
   
   public let scope: ScopeClaim
   
@@ -23,9 +22,9 @@ public struct GoogleAccessToken: OAuthToken {
   public init(
     accessToken: AccessTokenClaim,
     expiresIn: ExpiresInClaim,
-    refreshToken: RefreshTokenClaim,
+    refreshToken: RefreshTokenClaim? = nil,
     scope: ScopeClaim,
-    tokenType: TokenTypeClaim
+    tokenType: TokenTypeClaim = "Bearer"
   ) {
     self.accessToken = accessToken
     self.expiresIn = expiresIn
@@ -34,22 +33,25 @@ public struct GoogleAccessToken: OAuthToken {
     self.tokenType = tokenType
   }
   
-  public func encode(to encoder: Encoder) throws {
-    var container = encoder.container(keyedBy: CodingKeys.self)
-    try container.encode(self.accessToken, forKey: .accessToken)
-    try container.encode(self.expiresIn, forKey: .expiresIn)
-    try container.encode(self.refreshToken, forKey: .refreshToken)
-    try container.encode(self.scope, forKey: .scope)
-    try container.encode(self.tokenType, forKey: .tokenType)
-  }
-  
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     self.accessToken = try container.decode(AccessTokenClaim.self, forKey: .accessToken)
     self.expiresIn = try container.decode(ExpiresInClaim.self, forKey: .expiresIn)
-    self.refreshToken = try container.decode(RefreshTokenClaim.self, forKey: .refreshToken)
+    self.refreshToken = try container.decodeIfPresent(RefreshTokenClaim.self, forKey: .refreshToken)
     self.scope = try container.decode(ScopeClaim.self, forKey: .scope)
     self.tokenType = try container.decode(TokenTypeClaim.self, forKey: .tokenType)
   }
+  
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(accessToken, forKey: .accessToken)
+    try container.encode(expiresIn, forKey: .expiresIn)
+    try container.encodeIfPresent(refreshToken, forKey: .refreshToken)
+    try container.encode(scope, forKey: .scope)
+    try container.encode(tokenType, forKey: .tokenType)
+  }
+  
+  public func verify() async throws {
+    try self.expiresIn.verifyNotExpired()
+  }
 }
-
