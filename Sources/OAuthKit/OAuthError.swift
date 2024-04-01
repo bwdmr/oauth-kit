@@ -6,13 +6,14 @@ public struct OAuthError: Error, @unchecked Sendable {
   public struct ErrorType: Sendable, Hashable, CustomStringConvertible {
     
     enum Base: Sendable, Hashable {
-      case invalidBool
-      case invalidInt
-      case invalidURL
-      case redirecturiMismatch
       case claimMissingRequiredMember
       case claimVerificationFailure
       case generic
+      case invalidBool
+      case invalidInt
+      case invalidURL
+      case invalidToken
+      case redirecturiMismatch
     }
     
     let base: Base
@@ -21,13 +22,14 @@ public struct OAuthError: Error, @unchecked Sendable {
       self.base = base
     }
   
-    public static let invalidBool = Self(.invalidBool)
-    public static let invalidInt = Self(.invalidInt)
-    public static let invalidURL = Self(.invalidURL)
-    public static let redirecturiMismatch = Self(.redirecturiMismatch)
     public static let claimMissingRequiredMember = Self(.claimMissingRequiredMember)
     public static let claimVerificationFailure = Self(.claimVerificationFailure)
     public static let generic = Self(.generic)
+    public static let invalidBool = Self(.invalidBool)
+    public static let invalidInt = Self(.invalidInt)
+    public static let invalidURL = Self(.invalidURL)
+    public static let invalidToken = Self(.invalidToken)
+    public static let redirecturiMismatch = Self(.redirecturiMismatch)
     
     public var description: String {
       switch self.base {
@@ -37,6 +39,8 @@ public struct OAuthError: Error, @unchecked Sendable {
         "invalid_int"
       case .invalidURL:
         "invalid_url"
+      case .invalidToken:
+        "invalid_token"
       case .claimMissingRequiredMember:
         "claim_missing_required_member"
       case .claimVerificationFailure:
@@ -98,32 +102,8 @@ public struct OAuthError: Error, @unchecked Sendable {
   init(errorType: ErrorType) {
     self.backing = .init(errorType: errorType)
   }
- 
-  
-  ///
-  public static func invalidBool(_ name: String) -> Self {
-    var new = Self(errorType: .invalidBool)
-    new.name = name
-    return new
-  }
   
   
-  ///
-  public static func invalidInt(_ name: String) -> Self {
-    var new = Self(errorType: .invalidInt)
-    new.name = name
-    return new
-  }
-  
- 
-  ///
-  public static func invalidURL(_ name: String) -> Self {
-    var new = Self(errorType: .invalidURL)
-    new.name = name
-    return new
-  }
-  
- 
   ///
   public static func claimMissingRequiredMember(failedClaim: (any OAuthClaim)?, reason: String) -> Self {
     var new = Self(errorType: .claimMissingRequiredMember)
@@ -141,20 +121,52 @@ public struct OAuthError: Error, @unchecked Sendable {
     return new
   }
   
-  
+    
   ///
-  public static func redirecturiMismatch(failedClaim: (any OAuthClaim)?, reason: String) -> Self {
-    var new = Self(errorType: .redirecturiMismatch)
-    new.failedClaim = failedClaim
+  public static func generic(identifier: String, reason: String) -> Self {
+    var new = Self(errorType: .generic)
+    new.identifier = identifier
     new.reason = reason
     return new
   }
   
   
   ///
-  public static func generic(identifier: String, reason: String) -> Self {
-    var new = Self(errorType: .generic)
-    new.identifier = identifier
+  public static func invalidBool(_ name: String) -> Self {
+    var new = Self(errorType: .invalidBool)
+    new.name = name
+    return new
+  }
+  
+  
+  ///
+  public static func invalidInt(_ name: String) -> Self {
+    var new = Self(errorType: .invalidInt)
+    new.name = name
+    return new
+  }
+ 
+  
+  ///
+  public static func invalidURL(_ name: String) -> Self {
+    var new = Self(errorType: .invalidURL)
+    new.name = name
+    return new
+  }
+  
+ 
+  ///
+  public static func invalidToken(_ name: String) -> Self {
+    var new = Self(errorType: .invalidToken)
+    new.name = name
+    return new
+  }
+  
+  
+  ///
+  public static func redirecturiMismatch(failedClaim: (any OAuthClaim)?, reason: String) -> Self {
+    var new = Self(errorType: .redirecturiMismatch)
+    new.failedClaim = failedClaim
     new.reason = reason
     return new
   }
