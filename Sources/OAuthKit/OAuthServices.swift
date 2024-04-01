@@ -1,6 +1,6 @@
 import Foundation
 
-public actor OAuthControl: Sendable {
+public actor OAuthServices: Sendable {
   
   private var storage: [OAuthIdentifier: OAuthService]
   private var `default`: OAuthService?
