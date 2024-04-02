@@ -3,7 +3,7 @@ import Foundation
 
 
 
-public struct GoogleService: OAuthServicable {
+public struct GoogleService: OAuthServiceable {
   
   public let oauthIdentifier: OAuthIdentifier?
   

@@ -8,10 +8,11 @@ public protocol OAuthToken: Codable, Sendable {
 }
 
 
-public protocol OAuthServicable {
+public protocol OAuthServiceable: Sendable {
   func authorizationURL() throws -> URL
   func accessURL(code: String) throws -> URL
 }
+
 
 public struct OAuthIdentifier: Hashable, Equatable, Sendable {
   public let string: String
@@ -20,6 +21,7 @@ public struct OAuthIdentifier: Hashable, Equatable, Sendable {
     self.string = string
   }
 }
+
 
 extension OAuthIdentifier: Codable {
   public init(from decoder: Decoder) throws {
@@ -33,6 +35,7 @@ extension OAuthIdentifier: Codable {
   }
 }
 
+
 extension OAuthIdentifier: ExpressibleByStringLiteral {
   public init(stringLiteral value: String) {
     self.init(string: value)
@@ -40,11 +43,10 @@ extension OAuthIdentifier: ExpressibleByStringLiteral {
 }
 
 
-
 public actor OAuthService: Sendable {
   
-  private var storage: [OAuthIdentifier: OAuthServicable]
-  private var `default`: OAuthServicable?
+  private var storage: [OAuthIdentifier: OAuthServiceable]
+  private var `default`: OAuthServiceable?
   
   public init() {
     self.storage = [:]
@@ -53,7 +55,7 @@ public actor OAuthService: Sendable {
   
   /// add a service
   @discardableResult
-  func add(_ oauthservice: OAuthServicable, for id: OAuthIdentifier) -> Self {
+  func add(_ oauthservice: OAuthServiceable, for id: OAuthIdentifier) -> Self {
     
     if self.storage[id] != nil {
       print("Warning: Overwriting existing OAuth configuration for key identifier; '\(id)'.") }
