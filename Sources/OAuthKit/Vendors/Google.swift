@@ -1,7 +1,18 @@
 import Foundation
 
-public struct GoogleConfiguration: OAuthConfiguration {
+
+
+
+public struct GoogleService: OAuthServicable {
+  
+  public let oauthIdentifier: OAuthIdentifier?
+  
+  public let authorizationEndpoint: String?
+  
+  public let accessEndpoint: String?
+  
   enum CodingKeys: String, CodingKey {
+    case oauthIdentifier = "oauth_identifier"
     case authorizationEndpoint = "authorization_endpoint"
     case accessEndpoint = "access_endpoint"
     case accessType = "access_type"
@@ -19,10 +30,6 @@ public struct GoogleConfiguration: OAuthConfiguration {
   }
   
   public let accessType: AccessTypeClaim
-  
-  public let authorizationEndpoint: String?
-  
-  public let accessEndpoint: String?
   
   public let clientID: ClientIDClaim
   
@@ -47,6 +54,7 @@ public struct GoogleConfiguration: OAuthConfiguration {
   public let state: StateClaim?
   
   public init(
+    oauthIdentifier: OAuthIdentifier,
     accessEndpoint: String,
     authorizationEndpoint: String,
     accessType: AccessTypeClaim = "online",
@@ -62,6 +70,7 @@ public struct GoogleConfiguration: OAuthConfiguration {
     prompt: PromptClaim? = nil,
     responseType: ResponseTypeClaim = "code"
   ) {
+    self.oauthIdentifier = oauthIdentifier
     self.accessEndpoint = accessEndpoint
     self.authorizationEndpoint = authorizationEndpoint
     self.accessType = accessType
@@ -80,6 +89,7 @@ public struct GoogleConfiguration: OAuthConfiguration {
   
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.oauthIdentifier = try container.decodeIfPresent(OAuthIdentifier.self, forKey: .oauthIdentifier)
     self.accessEndpoint = try container.decodeIfPresent(String.self, forKey: .accessEndpoint)
     self.authorizationEndpoint = try container.decodeIfPresent(String.self, forKey: .authorizationEndpoint)
     self.accessType = try container.decode(AccessTypeClaim.self, forKey: .accessType)
@@ -98,6 +108,7 @@ public struct GoogleConfiguration: OAuthConfiguration {
   
   public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(oauthIdentifier, forKey: .oauthIdentifier)
     try container.encodeIfPresent(accessEndpoint, forKey: .accessEndpoint)
     try container.encodeIfPresent(authorizationEndpoint, forKey: .authorizationEndpoint)
     try container.encode(accessType, forKey: .accessType)
@@ -114,7 +125,7 @@ public struct GoogleConfiguration: OAuthConfiguration {
     try container.encodeIfPresent(state, forKey: .state)
   }
   
-  public func configureaccessURL(code: String) throws -> URL {
+  public func accessURL(code: String) throws -> URL {
     guard
       let endpoint = self.accessEndpoint,
       let endpointURL = URL(string: endpoint)
@@ -140,7 +151,9 @@ public struct GoogleConfiguration: OAuthConfiguration {
     return url
   }
   
-  public func configureauthorizationURL() throws -> URL {
+  
+  
+  public func authorizationURL() throws -> URL {
     guard
       let endpoint = self.authorizationEndpoint,
       let endpointURL = URL(string: endpoint)
@@ -192,3 +205,65 @@ public struct GoogleConfiguration: OAuthConfiguration {
     return url
   }
 }
+
+
+extension GoogleService {
+  
+  public struct AccessToken: OAuthToken {
+    enum CodingKeys: String, CodingKey {
+      case accessToken = "access_token"
+      case expiresIn = "expires_in"
+      case refreshToken = "refresh_token"
+      case scope = "scope"
+      case tokenType = "token_type"
+    }
+    
+    public let accessToken: AccessTokenClaim
+    
+    public let expiresIn: ExpiresInClaim
+    
+    public let refreshToken: RefreshTokenClaim?
+    
+    public let scope: ScopeClaim
+    
+    public let tokenType: TokenTypeClaim
+    
+    public init(
+      accessToken: AccessTokenClaim,
+      expiresIn: ExpiresInClaim,
+      refreshToken: RefreshTokenClaim? = nil,
+      scope: ScopeClaim,
+      tokenType: TokenTypeClaim = "Bearer"
+    ) {
+      self.accessToken = accessToken
+      self.expiresIn = expiresIn
+      self.refreshToken = refreshToken
+      self.scope = scope
+      self.tokenType = tokenType
+    }
+    
+    public init(from decoder: Decoder) throws {
+      let container = try decoder.container(keyedBy: CodingKeys.self)
+      self.accessToken = try container.decode(AccessTokenClaim.self, forKey: .accessToken)
+      self.expiresIn = try container.decode(ExpiresInClaim.self, forKey: .expiresIn)
+      self.refreshToken = try container.decodeIfPresent(RefreshTokenClaim.self, forKey: .refreshToken)
+      self.scope = try container.decode(ScopeClaim.self, forKey: .scope)
+      self.tokenType = try container.decode(TokenTypeClaim.self, forKey: .tokenType)
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+      var container = encoder.container(keyedBy: CodingKeys.self)
+      try container.encode(accessToken, forKey: .accessToken)
+      try container.encode(expiresIn, forKey: .expiresIn)
+      try container.encodeIfPresent(refreshToken, forKey: .refreshToken)
+      try container.encode(scope, forKey: .scope)
+      try container.encode(tokenType, forKey: .tokenType)
+    }
+    
+    public func verify() async throws {
+      try self.expiresIn.verifyNotExpired()
+    }
+  }
+}
+  
+  
