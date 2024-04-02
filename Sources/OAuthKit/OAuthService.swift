@@ -17,9 +17,7 @@ struct OAuthService: Sendable {
     do {
       let encodedToken = token.copyBytes()
       _token = try jsonDecoder.decode(
-        Token.self,
-        from: .init(encodedToken.base64URLDecodedBytes())
-      )
+        Token.self, from: .init(encodedToken.base64URLDecodedBytes()) )
     } catch {
       throw OAuthError.invalidToken(
         "Couldn't decode OAuth with error: \(String(describing: error))")

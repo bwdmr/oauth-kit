@@ -14,6 +14,7 @@ public struct OAuthError: Error, @unchecked Sendable {
       case invalidURL
       case invalidService
       case invalidToken
+      case missingService
       case redirecturiMismatch
     }
     
@@ -31,10 +32,15 @@ public struct OAuthError: Error, @unchecked Sendable {
     public static let invalidURL = Self(.invalidURL)
     public static let invalidService = Self(.invalidService)
     public static let invalidToken = Self(.invalidToken)
+    public static let missingService = Self(.missingService)
     public static let redirecturiMismatch = Self(.redirecturiMismatch)
     
     public var description: String {
       switch self.base {
+      case .claimMissingRequiredMember:
+        "claim_missing_required_member"
+      case .claimVerificationFailure:
+        "claim_verification_failure"
       case .invalidBool:
         "invalid_bool"
       case .invalidInt:
@@ -45,10 +51,8 @@ public struct OAuthError: Error, @unchecked Sendable {
         "invalid_service"
       case .invalidToken:
         "invalid_token"
-      case .claimMissingRequiredMember:
-        "claim_missing_required_member"
-      case .claimVerificationFailure:
-        "claim_verification_failure"
+      case .missingService:
+        "missing_service"
       case .redirecturiMismatch:
         "redirect_uri_mismatch"
       case .generic:
@@ -170,6 +174,14 @@ public struct OAuthError: Error, @unchecked Sendable {
   ///
   public static func invalidToken(_ name: String) -> Self {
     var new = Self(errorType: .invalidToken)
+    new.name = name
+    return new
+  }
+  
+  
+  ///
+  public static func missingService(_ name: String) -> Self {
+    var new = Self(errorType: .missingService)
     new.name = name
     return new
   }
