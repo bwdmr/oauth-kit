@@ -55,14 +55,10 @@ public actor OAuthService: Sendable {
   
   /// add a service
   @discardableResult
-  func add(_ oauthservice: OAuthServiceable, for id: OAuthIdentifier) -> Self {
-    
+  public func add(_ oauthservice: OAuthServiceable, for id: OAuthIdentifier) throws -> Self {
     if self.storage[id] != nil {
-      print("Warning: Overwriting existing OAuth configuration for key identifier; '\(id)'.") }
+      print("Warning: Overwriting existing OAuth configuration for service identifier; '\(id)'.") }
     self.storage[id] = oauthservice
-    
-    if self.default != nil {
-      print("Warning: Overwriting existing default OAuth configuration.") }
     self.default = oauthservice
     
     return self
@@ -70,7 +66,7 @@ public actor OAuthService: Sendable {
   
   
   /// remove a service
-  func remove(_ id: OAuthIdentifier) -> Self {
+  public func remove(_ id: OAuthIdentifier) -> Self {
     if let _ = self.storage[id] {
       self.storage[id] = nil
     }
