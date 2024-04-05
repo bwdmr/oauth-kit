@@ -5,7 +5,7 @@ import Foundation
 
 public struct GoogleService: OAuthServiceable {
   
-  public let oauthIdentifier: OAuthIdentifier?
+  public var oauthIdentifier: OAuthIdentifier? = OAuthIdentifier(string: "google")
   
   public let authorizationEndpoint: String?
   
@@ -54,7 +54,6 @@ public struct GoogleService: OAuthServiceable {
   public let state: StateClaim?
   
   public init(
-    oauthIdentifier: OAuthIdentifier,
     accessEndpoint: String,
     authorizationEndpoint: String,
     accessType: AccessTypeClaim = "online",
@@ -70,7 +69,6 @@ public struct GoogleService: OAuthServiceable {
     prompt: PromptClaim? = nil,
     responseType: ResponseTypeClaim = "code"
   ) {
-    self.oauthIdentifier = oauthIdentifier
     self.accessEndpoint = accessEndpoint
     self.authorizationEndpoint = authorizationEndpoint
     self.accessType = accessType
