@@ -9,8 +9,8 @@ public protocol OAuthToken: Codable, Sendable {
 
 
 public protocol OAuthServiceable: Sendable {
-  func authorizationURL() throws -> URL
-  func accessURL(code: String) throws -> URL
+  func authenticationURL() throws -> URL
+  func tokenURL(code: String) throws -> URL
 }
 
 
@@ -74,7 +74,7 @@ public actor OAuthService: Sendable {
     return self
   }
   
- 
+  
   /// set default service
   @discardableResult
   public func use(_ id: OAuthIdentifier) throws -> Self {
@@ -83,37 +83,37 @@ public actor OAuthService: Sendable {
     }
     throw OAuthError.invalidService("\(id)")
   }
- 
+  
   
   ///
-  func authorizationURL(_ id: OAuthIdentifier? = nil) throws -> URL {
+  func authenticationURL(_ id: OAuthIdentifier? = nil) throws -> URL {
     if let id = id {
       
       if let service = self.storage[id] {
-        return try service.authorizationURL() }
-    }
+        return try service.authenticationURL()
+      }}
     
     else {
       if let `default` = `default` {
-        return try `default`.authorizationURL()
-    }}
+        return try `default`.authenticationURL()
+      }}
     
     throw OAuthError.invalidService("default nor 'n/A' is available")
   }
   
   
   ///
-  func accessURL(_ id: OAuthIdentifier? = nil, code: String) throws -> URL {
+  func tokenURL(_ id: OAuthIdentifier? = nil, code: String) throws -> URL {
     if let id = id {
       
       if let service = self.storage[id] {
-        return try service.accessURL(code: code) }
-    }
+        return try service.tokenURL(code: code)
+      }}
     
     else {
       if let `default` = `default` {
-        return try `default`.accessURL(code: code)
-    }}
+        return try `default`.tokenURL(code: code)
+      }}
     
     throw OAuthError.invalidService("default nor 'n/A' is available")
   }
@@ -121,7 +121,7 @@ public actor OAuthService: Sendable {
   
   ///
   public func verify<Token>(_ token: String, as _: Token.Type = Token.self)
-  async throws -> Token where Token: OAuthToken 
+  async throws -> Token where Token: OAuthToken
   {
     try await self.verify([UInt8](token.utf8), as: Token.self)
   }

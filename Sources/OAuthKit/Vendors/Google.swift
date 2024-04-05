@@ -7,14 +7,14 @@ public struct GoogleService: OAuthServiceable {
   
   public var oauthIdentifier: OAuthIdentifier? = OAuthIdentifier(string: "google")
   
-  public let authorizationEndpoint: String?
+  public let authenticationEndpoint: String?
   
-  public let accessEndpoint: String?
+  public let tokenEndpoint: String?
   
   enum CodingKeys: String, CodingKey {
     case oauthIdentifier = "oauth_identifier"
-    case authorizationEndpoint = "authorization_endpoint"
-    case accessEndpoint = "access_endpoint"
+    case authenticationEndpoint = "authentication_endpoint"
+    case tokenEndpoint = "token_endpoint"
     case accessType = "access_type"
     case clientID = "client_id"
     case clientSecret = "client_secret"
@@ -54,8 +54,8 @@ public struct GoogleService: OAuthServiceable {
   public let state: StateClaim?
   
   public init(
-    accessEndpoint: String,
-    authorizationEndpoint: String,
+    authenticationEndpoint: String,
+    tokenEndpoint: String,
     accessType: AccessTypeClaim = "online",
     clientID: ClientIDClaim,
     clientSecret: ClientSecretClaim,
@@ -69,8 +69,8 @@ public struct GoogleService: OAuthServiceable {
     prompt: PromptClaim? = nil,
     responseType: ResponseTypeClaim = "code"
   ) {
-    self.accessEndpoint = accessEndpoint
-    self.authorizationEndpoint = authorizationEndpoint
+    self.authenticationEndpoint = authenticationEndpoint
+    self.tokenEndpoint = tokenEndpoint
     self.accessType = accessType
     self.clientID = clientID
     self.clientSecret = clientSecret
@@ -88,8 +88,8 @@ public struct GoogleService: OAuthServiceable {
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     self.oauthIdentifier = try container.decodeIfPresent(OAuthIdentifier.self, forKey: .oauthIdentifier)
-    self.accessEndpoint = try container.decodeIfPresent(String.self, forKey: .accessEndpoint)
-    self.authorizationEndpoint = try container.decodeIfPresent(String.self, forKey: .authorizationEndpoint)
+    self.authenticationEndpoint = try container.decodeIfPresent(String.self, forKey: .authenticationEndpoint)
+    self.tokenEndpoint = try container.decodeIfPresent(String.self, forKey: .tokenEndpoint)
     self.accessType = try container.decode(AccessTypeClaim.self, forKey: .accessType)
     self.clientID = try container.decode(ClientIDClaim.self, forKey: .clientID)
     self.clientSecret = try container.decode(ClientSecretClaim.self, forKey: .clientSecret)
@@ -107,8 +107,8 @@ public struct GoogleService: OAuthServiceable {
   public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
     try container.encodeIfPresent(oauthIdentifier, forKey: .oauthIdentifier)
-    try container.encodeIfPresent(accessEndpoint, forKey: .accessEndpoint)
-    try container.encodeIfPresent(authorizationEndpoint, forKey: .authorizationEndpoint)
+    try container.encodeIfPresent(authenticationEndpoint, forKey: .authenticationEndpoint)
+    try container.encodeIfPresent(tokenEndpoint, forKey: .tokenEndpoint)
     try container.encode(accessType, forKey: .accessType)
     try container.encode(clientID, forKey: .clientID)
     try container.encode(clientSecret, forKey: .clientSecret)
@@ -123,39 +123,12 @@ public struct GoogleService: OAuthServiceable {
     try container.encodeIfPresent(state, forKey: .state)
   }
   
-  public func accessURL(code: String) throws -> URL {
+  
+  public func authenticationURL() throws -> URL {
     guard
-      let endpoint = self.accessEndpoint,
+      let endpoint = self.authenticationEndpoint,
       let endpointURL = URL(string: endpoint)
-    else { throw OAuthError.invalidURL("misconfigured endpoint: \(self.accessEndpoint)") }
-    
-    var components = URLComponents()
-    components.scheme = endpointURL.scheme
-    components.host = endpointURL.host
-    components.path = endpointURL.path
-    components.queryItems = {
-      var queryitemList = [
-        URLQueryItem(name: ClientIDClaim.key.stringValue, value: clientID.value),
-        URLQueryItem(name: ClientSecretClaim.key.stringValue, value: clientSecret.value),
-        URLQueryItem(name: CodeClaim.key.stringValue, value: code),
-        URLQueryItem(name: GrantTypeClaim.key.stringValue, value: grantType?.value),
-        URLQueryItem(name: RedirectURIClaim.key.stringValue, value: redirectURI.value)
-      ]
-      
-      return queryitemList
-    }()
-    
-    guard let url = components.url else { throw OAuthError.invalidURL("misconfigured url.") }
-    return url
-  }
-  
-  
-  
-  public func authorizationURL() throws -> URL {
-    guard
-      let endpoint = self.authorizationEndpoint,
-      let endpointURL = URL(string: endpoint)
-    else { throw OAuthError.invalidURL("misconfigured endpoint: \(self.authorizationEndpoint)") }
+    else { throw OAuthError.invalidURL("misconfigured endpoint: \(self.authenticationEndpoint)") }
     
     var components = URLComponents()
     components.scheme = endpointURL.scheme
@@ -202,6 +175,33 @@ public struct GoogleService: OAuthServiceable {
     guard let url = components.url else { throw OAuthError.invalidURL("misconfigured url.") }
     return url
   }
+  
+  
+  public func tokenURL(code: String) throws -> URL {
+    guard
+      let endpoint = self.tokenEndpoint,
+      let endpointURL = URL(string: endpoint)
+    else { throw OAuthError.invalidURL("misconfigured endpoint: \(self.tokenEndpoint)") }
+    
+    var components = URLComponents()
+    components.scheme = endpointURL.scheme
+    components.host = endpointURL.host
+    components.path = endpointURL.path
+    components.queryItems = {
+      var queryitemList = [
+        URLQueryItem(name: ClientIDClaim.key.stringValue, value: clientID.value),
+        URLQueryItem(name: ClientSecretClaim.key.stringValue, value: clientSecret.value),
+        URLQueryItem(name: CodeClaim.key.stringValue, value: code),
+        URLQueryItem(name: GrantTypeClaim.key.stringValue, value: grantType?.value),
+        URLQueryItem(name: RedirectURIClaim.key.stringValue, value: redirectURI.value)
+      ]
+      
+      return queryitemList
+    }()
+    
+    guard let url = components.url else { throw OAuthError.invalidURL("misconfigured url.") }
+    return url
+  }
 }
 
-  
+
