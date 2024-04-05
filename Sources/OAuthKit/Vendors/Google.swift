@@ -137,7 +137,7 @@ public struct GoogleService: OAuthServiceable {
       var queryitemList = [
         URLQueryItem(name: ClientIDClaim.key.stringValue, value: clientID.value),
         URLQueryItem(name: ClientSecretClaim.key.stringValue, value: clientSecret.value),
-        URLQueryItem(name: "code", value: code),
+        URLQueryItem(name: CodeClaim.key.stringValue, value: code),
         URLQueryItem(name: GrantTypeClaim.key.stringValue, value: grantType?.value),
         URLQueryItem(name: RedirectURIClaim.key.stringValue, value: redirectURI.value)
       ]
