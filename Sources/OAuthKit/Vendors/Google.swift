@@ -2,7 +2,6 @@ import Foundation
 
 
 
-
 public struct GoogleService: OAuthServiceable {
   
   public var oauthIdentifier: OAuthIdentifier? = OAuthIdentifier(string: "google")
@@ -139,7 +138,7 @@ public struct GoogleService: OAuthServiceable {
         URLQueryItem(name: ClientIDClaim.key.stringValue, value: clientID.value),
         URLQueryItem(name: RedirectURIClaim.key.stringValue, value: redirectURI.value),
         URLQueryItem(name: ResponseTypeClaim.key.stringValue, value: responseType.value),
-        URLQueryItem(name: ScopeClaim.key.stringValue, value: scope.value),
+        URLQueryItem(name: ScopeClaim.key.stringValue, value: scope.value.joined()),
         URLQueryItem(name: AccessTypeClaim.key.stringValue, value: accessType.value)
       ]
       
@@ -205,7 +204,7 @@ public struct GoogleService: OAuthServiceable {
 }
 
 extension GoogleService {
-  public struct AccessToken: OAuthToken {
+  public struct Token: OAuthToken {
     enum CodingKeys: String, CodingKey {
       case accessToken = "access_token"
       case expiresIn = "expires_in"

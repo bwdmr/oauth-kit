@@ -1,7 +1,9 @@
 import Foundation
 
 
-
+public protocol OAuthAccess: OAuthToken, Codable, Sendable {
+  var endpoint: URL { get set }
+}
 
 public protocol OAuthToken: Codable, Sendable {
   func verify() async throws

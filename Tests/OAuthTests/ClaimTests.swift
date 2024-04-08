@@ -201,7 +201,8 @@ final class ClaimTests: XCTestCase {
     let str = #"{"scope": "https://www.googleapis.com/auth/drive.metadata.readonly/"}"#
     let data = str.data(using: .utf8)!
     let decoded = try! JSONDecoder().decode(ScopePayload.self, from: data)
-    XCTAssertEqual(decoded.scope, "https://www.googleapis.com/auth/drive.metadata.readonly/")
+    XCTAssertTrue(decoded.scope.value.contains( "https://www.googleapis.com/auth/drive.metadata.readonly/"
+    ))
   }
   
   
