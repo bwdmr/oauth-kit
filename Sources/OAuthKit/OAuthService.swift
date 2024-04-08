@@ -6,7 +6,6 @@ import Combine
 public actor OAuthService: Sendable {
   
   private var storage: [OAuthIdentifier: OAuthServiceable]
-  private var `default`: OAuthServiceable?
   
   public init() {
     self.storage = [:]
@@ -15,65 +14,41 @@ public actor OAuthService: Sendable {
   
   /// add a service
   @discardableResult
-  public func add(_ oauthservice: OAuthServiceable, for id: OAuthIdentifier) throws -> Self {
+  public func register(_ service: OAuthServiceable, _ use: OAuthToken..., head: String) throws -> Self {
+    let id = service.id
+    
+    var service = service
+    
+    for token in use {
+      guard token.scope.value.count == 1 else { 
+        throw OAuthError.tokenScopeDefinitionFailure(
+          failedToken: token, reason: "multiple scopes cannot be configured") }
+      
+      let scope = token.scope.value.first!
+      try service.add(token, isHead: scope == head)
+    }
+    
     if self.storage[id] != nil {
       print("Warning: Overwriting existing OAuth configuration for service identifier; '\(id)'.") }
-    self.storage[id] = oauthservice
-    self.default = oauthservice
+    self.storage[id] = service
     
     return self
-  }
-  
-  
-  /// remove a service
-  public func remove(_ id: OAuthIdentifier) -> Self {
-    if let _ = self.storage[id] {
-      self.storage[id] = nil
-    }
-    
-    return self
-  }
-  
-  
-  /// set default service
-  @discardableResult
-  public func use(_ id: OAuthIdentifier) throws -> Self {
-    if let service = self.storage[id] {
-      self.default = service
-    }
-    throw OAuthError.invalidService("\(id)")
   }
   
   
   ///
-  func authenticationURL(_ id: OAuthIdentifier? = nil) throws -> URL {
-    if let id = id {
-      
-      if let service = self.storage[id] {
-        return try service.authenticationURL()
-      }}
-    
-    else {
-      if let `default` = `default` {
-        return try `default`.authenticationURL()
-      }}
+  func authenticationURL(_ id: OAuthIdentifier) throws -> URL {
+    if let service = self.storage[id] {
+      return try service.authenticationURL() }
     
     throw OAuthError.invalidService("default nor 'n/A' is available")
   }
   
   
   ///
-  func tokenURL(_ id: OAuthIdentifier? = nil, code: String) throws -> URL {
-    if let id = id {
-      
-      if let service = self.storage[id] {
-        return try service.tokenURL(code: code)
-      }}
-    
-    else {
-      if let `default` = `default` {
-        return try `default`.tokenURL(code: code)
-      }}
+  func tokenURL(_ id: OAuthIdentifier, code: String) throws -> URL {
+    if let service = self.storage[id] {
+      return try service.tokenURL(code: code) }
     
     throw OAuthError.invalidService("default nor 'n/A' is available")
   }
