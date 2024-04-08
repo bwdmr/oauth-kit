@@ -16,6 +16,7 @@ public struct OAuthError: Error, @unchecked Sendable {
       case invalidToken
       case missingService
       case redirecturiMismatch
+      case tokenScopeDefinitionFailure
     }
     
     let base: Base
@@ -26,6 +27,7 @@ public struct OAuthError: Error, @unchecked Sendable {
   
     public static let claimMissingRequiredMember = Self(.claimMissingRequiredMember)
     public static let claimVerificationFailure = Self(.claimVerificationFailure)
+    public static let tokenScopeDefinitionFailure = Self(.tokenScopeDefinitionFailure)
     public static let generic = Self(.generic)
     public static let invalidBool = Self(.invalidBool)
     public static let invalidInt = Self(.invalidInt)
@@ -41,6 +43,8 @@ public struct OAuthError: Error, @unchecked Sendable {
         "claim_missing_required_member"
       case .claimVerificationFailure:
         "claim_verification_failure"
+      case .generic:
+        "generic"
       case .invalidBool:
         "invalid_bool"
       case .invalidInt:
@@ -55,8 +59,8 @@ public struct OAuthError: Error, @unchecked Sendable {
         "missing_service"
       case .redirecturiMismatch:
         "redirect_uri_mismatch"
-      case .generic:
-        "generic"
+      case .tokenScopeDefinitionFailure:
+        "token_scope_definition_failure"
       }
     }
   }
@@ -68,7 +72,8 @@ public struct OAuthError: Error, @unchecked Sendable {
     fileprivate var reason: String?
     fileprivate var underlying: Error?
     fileprivate var identifier: String?
-    fileprivate var failedGrant: (any OAuthClaim)?
+    fileprivate var failedClaim: (any OAuthClaim)?
+    fileprivate var failedToken: (any OAuthToken)?
     
     init(errorType: ErrorType) {
       self.errorType = errorType
@@ -103,8 +108,13 @@ public struct OAuthError: Error, @unchecked Sendable {
   }
   
   public internal(set) var failedClaim: (any OAuthClaim)? {
-    get { self.backing.failedGrant }
-    set { self.backing.failedGrant = newValue }
+    get { self.backing.failedClaim }
+    set { self.backing.failedClaim = newValue }
+  }
+  
+  public internal(set) var failedToken: (any OAuthToken)? {
+    get { self.backing.failedToken }
+    set { self.backing.failedToken = newValue }
   }
   
   init(errorType: ErrorType) {
@@ -125,6 +135,15 @@ public struct OAuthError: Error, @unchecked Sendable {
   public static func claimVerificationFailure(failedClaim: (any OAuthClaim)?, reason: String) -> Self {
     var new = Self(errorType: .claimVerificationFailure)
     new.failedClaim = failedClaim
+    new.reason = reason
+    return new
+  }
+  
+  
+  ///
+  public static func tokenScopeDefinitionFailure(failedToken: (any OAuthToken)?, reason: String) -> Self {
+    var new = Self(errorType: .tokenScopeDefinitionFailure)
+    new.failedToken = failedToken
     new.reason = reason
     return new
   }
@@ -202,6 +221,9 @@ extension OAuthError: CustomStringConvertible {
     
     if let name {
       result.append(", name: \(String(reflecting: name))") }
+    
+    if let failedToken {
+      result.append(", failedToken: \(String(reflecting: failedToken))") }
     
     if let failedClaim {
       result.append(", failedClaim: \(String(reflecting: failedClaim))") }

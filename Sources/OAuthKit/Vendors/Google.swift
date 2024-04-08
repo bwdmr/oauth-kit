@@ -2,6 +2,9 @@ import Foundation
 
 
 
+public protocol GoogleToken: OAuthToken { }
+
+
 public struct GoogleService: OAuthServiceable {
   public var id: OAuthIdentifier = OAuthIdentifier(string: "google")
   
