@@ -3,15 +3,15 @@ import Foundation
 
 
 public struct GoogleService: OAuthServiceable {
+  public var id: OAuthIdentifier = OAuthIdentifier(string: "google")
   
-  public var oauthIdentifier: OAuthIdentifier? = OAuthIdentifier(string: "google")
   
   public let authenticationEndpoint: String?
   
   public let tokenEndpoint: String?
   
   enum CodingKeys: String, CodingKey {
-    case oauthIdentifier = "oauth_identifier"
+    case id = "oauth_identifier"
     case authenticationEndpoint = "authentication_endpoint"
     case tokenEndpoint = "token_endpoint"
     case accessType = "access_type"
