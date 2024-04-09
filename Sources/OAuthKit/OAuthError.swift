@@ -15,6 +15,7 @@ public struct OAuthError: Error, @unchecked Sendable {
       case invalidService
       case invalidToken
       case missingService
+      case missingRequirement
       case redirecturiMismatch
       case tokenScopeDefinitionFailure
     }
@@ -35,6 +36,7 @@ public struct OAuthError: Error, @unchecked Sendable {
     public static let invalidService = Self(.invalidService)
     public static let invalidToken = Self(.invalidToken)
     public static let missingService = Self(.missingService)
+    public static let missingRequirement = Self(.missingRequirement)
     public static let redirecturiMismatch = Self(.redirecturiMismatch)
     
     public var description: String {
@@ -57,6 +59,8 @@ public struct OAuthError: Error, @unchecked Sendable {
         "invalid_token"
       case .missingService:
         "missing_service"
+      case .missingRequirement:
+        "missing_requirement"
       case .redirecturiMismatch:
         "redirect_uri_mismatch"
       case .tokenScopeDefinitionFailure:
@@ -202,6 +206,15 @@ public struct OAuthError: Error, @unchecked Sendable {
   public static func missingService(_ name: String) -> Self {
     var new = Self(errorType: .missingService)
     new.name = name
+    return new
+  }
+  
+  
+  ///
+  public static func missingRequirement(failedToken: (any OAuthToken)?, reason: String) -> Self {
+    var new = Self(errorType: .missingRequirement)
+    new.identifier = reason
+    new.reason = reason
     return new
   }
   

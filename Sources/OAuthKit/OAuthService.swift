@@ -14,7 +14,12 @@ public actor OAuthService: Sendable {
   
   /// add a service
   @discardableResult
-  public func register(_ service: OAuthServiceable, _ use: OAuthToken..., head: String) throws -> Self {
+  public func register(_ service: OAuthServiceable, _ use: [OAuthToken], head: String) throws -> Self {
+    
+    guard use.count > 0 else {
+      throw OAuthError.missingRequirement(failedToken: nil, reason: "a service requires atleast one OAuthToken.")
+    }
+   
     let id = service.id
     
     var service = service
