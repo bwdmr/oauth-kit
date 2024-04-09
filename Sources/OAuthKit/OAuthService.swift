@@ -1,6 +1,5 @@
-import Foundation
 import Combine
-
+import Foundation
 
 
 public actor OAuthService: Sendable {

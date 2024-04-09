@@ -1,6 +1,5 @@
-import Foundation
 import Combine
-
+import Foundation
 
 
 public protocol GoogleToken: OAuthToken { }
