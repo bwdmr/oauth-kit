@@ -16,6 +16,8 @@ public protocol OAuthToken: Codable, Sendable {
   var tokenType: TokenTypeClaim? { get set }
   
   func verify() async throws
+  
+  mutating func mergable(_ other: Self) async throws
 }
 
 
@@ -31,8 +33,8 @@ extension OAuthToken {
 public protocol OAuthServiceable: Actor, Sendable {
   var id: OAuthIdentifier { get }
   
-  var token: [String: OAuthToken] { get set }
-  var `default`: OAuthToken? { get set }
+  var token: [String: any OAuthToken] { get set }
+  var `default`: (any OAuthToken)? { get set }
   
   func authenticationURL() async throws -> URL
   func tokenURL(code: String) async throws -> URL
@@ -41,11 +43,11 @@ public protocol OAuthServiceable: Actor, Sendable {
 
 
 extension OAuthServiceable {
-  var `default`: OAuthToken? { nil }
+  var `default`: (any OAuthToken)? { nil }
   
   @discardableResult
-  public mutating func add(_ token: OAuthToken, isHead: Bool = false) throws -> Self {
-    guard token.scope.value.count == 1 
+  public func add(_ token: any OAuthToken, isHead: Bool = false) throws -> Self {
+    guard token.scope.value.count == 1
     else { throw OAuthError.invalidToken( "pe.value.first!)") }
     
     let scope = token.scope.value.first!

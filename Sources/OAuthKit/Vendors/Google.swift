@@ -9,9 +9,9 @@ public protocol GoogleToken: OAuthToken { }
 public actor GoogleService: OAuthServiceable {
   public var id: OAuthIdentifier = OAuthIdentifier(string: "google")
   
-  public var `default`: OAuthToken?
-  
-  public var token: [String : OAuthToken]
+  public var `default`: (any OAuthToken)?
+
+  @Published public var token: [String : any OAuthToken]
   
   public let authenticationEndpoint: String?
   
