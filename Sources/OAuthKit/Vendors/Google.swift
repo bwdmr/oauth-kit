@@ -1,11 +1,12 @@
 import Foundation
+import Combine
 
 
 
 public protocol GoogleToken: OAuthToken { }
 
-
-public struct GoogleService: OAuthServiceable {
+@dynamicMemberLookup
+public actor GoogleService: OAuthServiceable {
   public var id: OAuthIdentifier = OAuthIdentifier(string: "google")
   
   public var `default`: OAuthToken?

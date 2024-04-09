@@ -20,21 +20,22 @@ public protocol OAuthToken: Codable, Sendable {
 
 
 extension OAuthToken {
-  func verify() throws {
+  func verify() async throws {
     try self.expiresIn?.verifyNotExpired()
   }
 }
 
 
+
 @dynamicMemberLookup
-public protocol OAuthServiceable: Sendable {
+public protocol OAuthServiceable: Actor, Sendable {
   var id: OAuthIdentifier { get }
   
   var token: [String: OAuthToken] { get set }
   var `default`: OAuthToken? { get set }
   
-  func authenticationURL() throws -> URL
-  func tokenURL(code: String) throws -> URL
+  func authenticationURL() async throws -> URL
+  func tokenURL(code: String) async throws -> URL
 }
 
 
@@ -58,7 +59,7 @@ extension OAuthServiceable {
   
   
   @discardableResult
-  public mutating func use(_ head: String) throws -> Self {
+  public func use(_ head: String) throws -> Self {
     if let token = self.token[head] {
       self.`default` = token
     }
@@ -76,7 +77,7 @@ extension OAuthServiceable {
   
   
   subscript<T>(dynamicMember member: String, _ value: T) -> T where T: OAuthToken {
-    mutating get { self.token[member] as! T }
+    get { self.token[member] as! T }
     set { self.token[member] = newValue }
   }
 }

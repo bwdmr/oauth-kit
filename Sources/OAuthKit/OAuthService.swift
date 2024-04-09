@@ -10,19 +10,19 @@ public actor OAuthService: Sendable {
   public init() {
     self.storage = [:]
   }
-  
+ 
   
   /// add a service
   @discardableResult
-  public func register(_ service: OAuthServiceable, _ use: [OAuthToken], head: String) throws -> Self {
+  public func register(_ service: OAuthServiceable, _ use: [any OAuthToken], head: String) async throws -> Self {
     
     guard use.count > 0 else {
       throw OAuthError.missingRequirement(failedToken: nil, reason: "a service requires atleast one OAuthToken.")
     }
    
-    let id = service.id
+    let id = await service.id
     
-    var service = service
+    let service = service
     
     for token in use {
       guard token.scope.value.count == 1 else { 
@@ -30,7 +30,7 @@ public actor OAuthService: Sendable {
           failedToken: token, reason: "multiple scopes cannot be configured") }
       
       let scope = token.scope.value.first!
-      try service.add(token, isHead: scope == head)
+      try await service.add(token, isHead: scope == head)
     }
     
     if self.storage[id] != nil {
@@ -42,18 +42,18 @@ public actor OAuthService: Sendable {
   
   
   ///
-  func authenticationURL(_ id: OAuthIdentifier) throws -> URL {
+  func authenticationURL(_ id: OAuthIdentifier) async throws -> URL {
     if let service = self.storage[id] {
-      return try service.authenticationURL() }
+      return try await service.authenticationURL() }
     
     throw OAuthError.invalidService("default nor 'n/A' is available")
   }
   
   
   ///
-  func tokenURL(_ id: OAuthIdentifier, code: String) throws -> URL {
+  func tokenURL(_ id: OAuthIdentifier, code: String) async throws -> URL {
     if let service = self.storage[id] {
-      return try service.tokenURL(code: code) }
+      return try await service.tokenURL(code: code) }
     
     throw OAuthError.invalidService("default nor 'n/A' is available")
   }
