@@ -4,6 +4,34 @@ import Foundation
 
 public protocol GoogleToken: OAuthToken { }
 
+extension GoogleToken {
+  public func verify() async throws {
+    try self.expiresIn?.verifyNotExpired()
+  }
+  
+  
+  @discardableResult
+  public func mergeable<Token>(_ other: inout Token)
+  async throws -> Token where Token: OAuthToken {
+    guard
+      let accessToken = self.accessToken,
+      let expiresIn = self.expiresIn,
+      let refreshToken = self.refreshToken,
+      let tokenType = self.tokenType
+    else { throw OAuthError.missingRequirement(
+      failedToken: other, reason: "insufficient information for authentication")}
+    
+    other.accessToken = accessToken
+    other.expiresIn = expiresIn
+    other.refreshToken = refreshToken
+    other.scope = other.scope
+    other.tokenType = tokenType
+    
+    return other
+  }
+}
+
+
 @dynamicMemberLookup
 public actor GoogleService: OAuthServiceable {
   public var id: OAuthIdentifier = OAuthIdentifier(string: "google")

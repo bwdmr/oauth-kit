@@ -17,15 +17,9 @@ public protocol OAuthToken: Codable, Sendable {
   
   func verify() async throws
  
-  mutating func mergable<Token>(_ other: Token)
-  async throws where Token: OAuthToken
-}
-
-
-extension OAuthToken {
-  func verify() async throws {
-    try self.expiresIn?.verifyNotExpired()
-  }
+  @discardableResult
+  func mergeable<Token>(_ other: inout Token)
+  async throws -> Token where Token: OAuthToken
 }
 
 
