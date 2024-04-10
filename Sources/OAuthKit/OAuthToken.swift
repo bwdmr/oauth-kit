@@ -16,8 +16,9 @@ public protocol OAuthToken: Codable, Sendable {
   var tokenType: TokenTypeClaim? { get set }
   
   func verify() async throws
-  
-  mutating func mergable(_ other: Self) async throws
+ 
+  mutating func mergable<Token>(_ other: Token)
+  async throws where Token: OAuthToken
 }
 
 
@@ -28,25 +29,23 @@ extension OAuthToken {
 }
 
 
-
 @dynamicMemberLookup
 public protocol OAuthServiceable: Actor, Sendable {
   var id: OAuthIdentifier { get }
   
-  var token: [String: any OAuthToken] { get set }
-  var `default`: (any OAuthToken)? { get set }
+  var token: [String: OAuthToken] { get set }
+  var head: (OAuthToken)? { get set }
   
   func authenticationURL() async throws -> URL
   func tokenURL(code: String) async throws -> URL
 }
 
 
-
 extension OAuthServiceable {
-  var `default`: (any OAuthToken)? { nil }
-  
+  var head: (OAuthToken)? { nil }
+ 
   @discardableResult
-  public func add(_ token: any OAuthToken, isHead: Bool = false) throws -> Self {
+  public func add(_ token: OAuthToken, isHead: Bool = false) throws -> Self {
     guard token.scope.value.count == 1
     else { throw OAuthError.invalidToken( "pe.value.first!)") }
     
@@ -54,7 +53,7 @@ extension OAuthServiceable {
     if self.token[scope] != nil {
       print("Warning: Overwriting existing OAuth Token implementation: '\(scope)'.") }
     self.token[scope] = token
-    self.default = token
+    self.head = token
     
     return self
   }
@@ -63,7 +62,7 @@ extension OAuthServiceable {
   @discardableResult
   public func use(_ head: String) throws -> Self {
     if let token = self.token[head] {
-      self.`default` = token
+      self.head = token
     }
     
     return self

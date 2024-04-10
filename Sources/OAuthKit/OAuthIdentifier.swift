@@ -21,6 +21,7 @@ extension OAuthIdentifier: Codable {
   }
 }
 
+
 extension OAuthIdentifier: ExpressibleByStringLiteral {
   public init(stringLiteral value: String) {
     self.init(string: value)

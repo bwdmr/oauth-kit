@@ -7,14 +7,12 @@ public protocol GoogleToken: OAuthToken { }
 @dynamicMemberLookup
 public actor GoogleService: OAuthServiceable {
   public var id: OAuthIdentifier = OAuthIdentifier(string: "google")
-  
-  public var `default`: (any OAuthToken)?
 
-  @Published public var token: [String : any OAuthToken]
-  
   public let authenticationEndpoint: String?
-  
   public let tokenEndpoint: String?
+  
+  @Published public var token: [String : OAuthToken] = [:]
+  public var head: (OAuthToken)?
   
   enum CodingKeys: String, CodingKey {
     case id = "oauth_identifier"
@@ -88,7 +86,6 @@ public actor GoogleService: OAuthServiceable {
     self.responseType = responseType
     self.scope = scope
     self.state = state
-    self.token = [:]
   }
   
   
