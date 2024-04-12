@@ -108,7 +108,7 @@ public actor GoogleService: OAuthServiceable {
     redirectURI: RedirectURIClaim,
     scope: ScopeClaim,
     state: StateClaim? = nil,
-    grantType: GrantTypeClaim = "authorization_code",
+    grantType: GrantTypeClaim = "token",
     enablegranularConsent: EnableGranularConsentClaim? = nil,
     includegrantedScopes: IncludeGrantedScopesClaim? = nil,
     loginHint: LoginHintClaim? = nil,
