@@ -23,6 +23,7 @@ public protocol OAuthToken: Codable, Sendable {
 }
 
 
+///
 @dynamicMemberLookup
 public protocol OAuthServiceable: Actor, Sendable {
   var id: OAuthIdentifier { get }
@@ -37,9 +38,11 @@ public protocol OAuthServiceable: Actor, Sendable {
 }
 
 
+///
 extension OAuthServiceable {
   var head: (OAuthToken)? { nil }
  
+  ///
   @discardableResult
   public func add(_ token: OAuthToken, isHead: Bool = false) throws -> Self {
     guard token.scope.value.count == 1
@@ -55,6 +58,7 @@ extension OAuthServiceable {
   }
   
   
+  ///
   @discardableResult
   public func use(_ head: String) throws -> Self {
     if let token = self.token[head] {
@@ -65,6 +69,7 @@ extension OAuthServiceable {
   }
   
   
+  ///
   subscript<T>(dynamicMember member: String) -> T? where T: OAuthToken {
     switch member {
     default:
@@ -73,18 +78,25 @@ extension OAuthServiceable {
   }
   
   
+  ///
   subscript<T>(dynamicMember member: String, _ value: T) -> T where T: OAuthToken {
     get { self.token[member] as! T }
     set { self.token[member] = newValue }
   }
   
-  
+ 
+  ///
   public func queryitemBuffer(_ items: [URLQueryItem]) throws -> [UInt8] {
-    let bodyString = items.map { String(describing: $0.description)}.joined(separator: "&")
-    guard let bodyData = bodyString.data(using: .utf8) else { throw OAuthError.invalidData("tokenURL") }
+    guard 
+      let bodyString = items.map({ String(describing: $0.description)}).joined(separator: "&")
+        .addingPercentEncoding(withAllowedCharacters: .urlHostAllowed),
+      let bodyData = bodyString.data(using: .utf8) 
+    else { throw OAuthError.invalidData("tokenURL") }
+    
     let buffer = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: bodyData.count)
     defer { buffer.deallocate() }
     let _ = bodyData.copyBytes(to: buffer)
+    
     return [UInt8](buffer)
   }
 }
