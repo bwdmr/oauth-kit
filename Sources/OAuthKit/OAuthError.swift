@@ -10,6 +10,7 @@ public struct OAuthError: Error, @unchecked Sendable {
       case claimVerificationFailure
       case generic
       case invalidBool
+      case invalidData
       case invalidInt
       case invalidURL
       case invalidService
@@ -31,6 +32,7 @@ public struct OAuthError: Error, @unchecked Sendable {
     public static let tokenScopeDefinitionFailure = Self(.tokenScopeDefinitionFailure)
     public static let generic = Self(.generic)
     public static let invalidBool = Self(.invalidBool)
+    public static let invalidData = Self(.invalidData)
     public static let invalidInt = Self(.invalidInt)
     public static let invalidURL = Self(.invalidURL)
     public static let invalidService = Self(.invalidService)
@@ -51,6 +53,8 @@ public struct OAuthError: Error, @unchecked Sendable {
         "invalid_bool"
       case .invalidInt:
         "invalid_int"
+      case .invalidData:
+        "invalid_data"
       case .invalidURL:
         "invalid_url"
       case .invalidService:
@@ -165,6 +169,14 @@ public struct OAuthError: Error, @unchecked Sendable {
   ///
   public static func invalidBool(_ name: String) -> Self {
     var new = Self(errorType: .invalidBool)
+    new.name = name
+    return new
+  }
+  
+  
+  ///
+  public static func invalidData(_ name: String) -> Self {
+    var new = Self(errorType: .invalidData)
     new.name = name
     return new
   }

@@ -2,13 +2,27 @@ import Combine
 import Foundation
 
 
-public protocol GoogleToken: OAuthToken { }
+
+public protocol GoogleToken: OAuthToken {
+  var endpoint: URL { get set }
+  
+  var accessToken: AccessTokenClaim? { get set }
+  
+  var expiresIn: ExpiresInClaim? { get set }
+  
+  var refreshToken: RefreshTokenClaim? { get set }
+  
+  var scope: ScopeClaim { get set }
+  
+  var tokenType: TokenTypeClaim? { get set }
+}
+
+
 
 extension GoogleToken {
   public func verify() async throws {
     try self.expiresIn?.verifyNotExpired()
   }
-  
   
   @discardableResult
   public func mergeable<Token>(_ other: inout Token)
@@ -30,6 +44,7 @@ extension GoogleToken {
     return other
   }
 }
+
 
 
 @dynamicMemberLookup
@@ -121,7 +136,7 @@ public actor GoogleService: OAuthServiceable {
     guard
       let endpoint = self.authenticationEndpoint,
       let endpointURL = URL(string: endpoint)
-    else { throw OAuthError.invalidURL("misconfigured endpoint: \(self.authenticationEndpoint)") }
+    else { throw OAuthError.invalidURL("misconfigured endpoint: \(String(describing: self.authenticationEndpoint))") }
     
     var components = URLComponents()
     components.scheme = endpointURL.scheme
@@ -170,18 +185,19 @@ public actor GoogleService: OAuthServiceable {
   }
   
   
-  public func tokenURL(code: String) throws -> URL {
+  public func tokenURL(code: String) throws -> (URL, [UInt8]) {
     guard
       let endpoint = self.tokenEndpoint,
       let endpointURL = URL(string: endpoint)
-    else { throw OAuthError.invalidURL("misconfigured endpoint: \(self.tokenEndpoint)") }
+    else { throw OAuthError.invalidURL("misconfigured endpoint: \(String(describing: self.tokenEndpoint))") }
     
     var components = URLComponents()
     components.scheme = endpointURL.scheme
     components.host = endpointURL.host
     components.path = endpointURL.path
-    components.queryItems = {
-      var queryitemList = [
+    
+    let items = {
+      let queryitemList = [
         URLQueryItem(name: ClientIDClaim.key.stringValue, value: clientID.value),
         URLQueryItem(name: ClientSecretClaim.key.stringValue, value: clientSecret.value),
         URLQueryItem(name: CodeClaim.key.stringValue, value: code),
@@ -193,6 +209,8 @@ public actor GoogleService: OAuthServiceable {
     }()
     
     guard let url = components.url else { throw OAuthError.invalidURL("misconfigured url.") }
-    return url
+    let data = try queryitemBuffer(items)
+    
+    return (url, data)
   }
 }

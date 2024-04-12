@@ -31,7 +31,9 @@ public protocol OAuthServiceable: Actor, Sendable {
   var head: (OAuthToken)? { get set }
   
   func authenticationURL() async throws -> URL
-  func tokenURL(code: String) async throws -> URL
+  func tokenURL(code: String) async throws -> (URL, [UInt8])
+  
+  func queryitemBuffer(_ items: [URLQueryItem]) throws -> [UInt8]
 }
 
 
@@ -74,6 +76,16 @@ extension OAuthServiceable {
   subscript<T>(dynamicMember member: String, _ value: T) -> T where T: OAuthToken {
     get { self.token[member] as! T }
     set { self.token[member] = newValue }
+  }
+  
+  
+  public func queryitemBuffer(_ items: [URLQueryItem]) throws -> [UInt8] {
+    let bodyString = items.map { String(describing: $0.description)}.joined(separator: "&")
+    guard let bodyData = bodyString.data(using: .utf8) else { throw OAuthError.invalidData("tokenURL") }
+    let buffer = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: bodyData.count)
+    defer { buffer.deallocate() }
+    let _ = bodyData.copyBytes(to: buffer)
+    return [UInt8](buffer)
   }
 }
 

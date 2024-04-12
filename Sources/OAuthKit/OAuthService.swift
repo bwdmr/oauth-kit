@@ -50,7 +50,7 @@ public actor OAuthService: Sendable {
   
   
   ///
-  func tokenURL(_ id: OAuthIdentifier, code: String) async throws -> URL {
+  func tokenURL(_ id: OAuthIdentifier, code: String) async throws -> (URL, [UInt8]) {
     if let service = self.storage[id] {
       return try await service.tokenURL(code: code) }
     
