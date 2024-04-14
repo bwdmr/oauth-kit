@@ -89,14 +89,15 @@ extension OAuthServiceable {
   public func queryitemBuffer(_ items: [URLQueryItem]) throws -> [UInt8] {
     let bodyString = try items.map({
       let key = $0.name
-      guard let value = $0.value?.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+      guard let value = $0.value?.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else {
         throw OAuthError.invalidData("tokenURL query item") }
       return String(describing: "\(key)=\(value)")
     }).joined(separator: "&")
         
-    guard let bodyData = bodyString.data(using: .utf8) else { throw OAuthError.invalidData("conversion error") }
-    let buffer = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: bodyData.count)
+    guard let bodyData = bodyString.data(using: .utf8) 
+    else { throw OAuthError.invalidData("conversion error") }
     
+    let buffer = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: bodyData.count)
     defer { buffer.deallocate() }
     let _ = bodyData.copyBytes(to: buffer)
     
