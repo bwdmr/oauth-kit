@@ -31,6 +31,8 @@ public protocol OAuthServiceable: Actor, Sendable {
   var token: [String: OAuthToken] { get set }
   var head: (OAuthToken)? { get set }
   
+  var redirectURI: RedirectURIClaim { get }
+  
   func authenticationURL() async throws -> URL
   func tokenURL(code: String) async throws -> (URL, [UInt8])
   
