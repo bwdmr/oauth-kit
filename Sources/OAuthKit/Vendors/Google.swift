@@ -136,7 +136,9 @@ public actor GoogleService: OAuthServiceable {
     guard
       let endpoint = self.authenticationEndpoint,
       let endpointURL = URL(string: endpoint)
-    else { throw OAuthError.invalidURL("misconfigured endpoint: \(String(describing: self.authenticationEndpoint))") }
+    else { throw OAuthError.invalidURL(
+      "misconfigured endpoint: \(String(describing: self.authenticationEndpoint))"
+    )}
     
     var components = URLComponents()
     components.scheme = endpointURL.scheme
@@ -189,7 +191,9 @@ public actor GoogleService: OAuthServiceable {
     guard
       let endpoint = self.tokenEndpoint,
       let endpointURL = URL(string: endpoint)
-    else { throw OAuthError.invalidURL("misconfigured endpoint: \(String(describing: self.tokenEndpoint))") }
+    else {
+      throw OAuthError.invalidURL("misconfigured endpoint: \(String(describing: self.tokenEndpoint))")
+    }
     
     var components = URLComponents()
     components.scheme = endpointURL.scheme
@@ -208,9 +212,10 @@ public actor GoogleService: OAuthServiceable {
       return queryitemList
     }()
     
-    guard let url = components.url else { throw OAuthError.invalidURL("misconfigured url.") }
-    let data = try queryitemBuffer(items)
+    guard let url = components.url else {
+      throw OAuthError.invalidURL("misconfigured url.") }
     
+    let data = try queryitemBuffer(items)
     return (url, data)
   }
 }
