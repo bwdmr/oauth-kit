@@ -43,29 +43,31 @@ public protocol OAuthServiceable: Actor, Sendable {
 ///
 extension OAuthServiceable {
   var head: (OAuthToken)? { nil }
- 
+
   ///
   @discardableResult
-  public func add(_ token: OAuthToken, isHead: Bool = false) throws -> Self {
+  public func add(_ token: OAuthToken) throws -> Self {
+    print("add token")
     guard token.scope.value.count == 1
-    else { throw OAuthError.invalidToken( "pe.value.first!)") }
+    else { throw OAuthError.invalidToken("Can't configure multiple scopes on a single token") }
+    
     
     let scope = token.scope.value.first!
     if self.token[scope] != nil {
       print("Warning: Overwriting existing OAuth Token implementation: '\(scope)'.") }
     self.token[scope] = token
-    self.head = token
     
     return self
   }
   
-  
   ///
   @discardableResult
-  public func use(_ head: String) throws -> Self {
-    if let token = self.token[head] {
-      self.head = token
-    }
+  public func add<HeadToken>(_ token: [OAuthToken], head: HeadToken)
+  throws -> Self where HeadToken: OAuthToken {
+    print("iterate token")
+    
+    for token in token { try self.add(token) }
+    self.head = head
     
     return self
   }
