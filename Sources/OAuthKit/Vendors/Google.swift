@@ -4,7 +4,7 @@ import Foundation
 
 
 public protocol GoogleToken: OAuthToken {
-  var endpoint: URL { get set }
+  var endpoint: URL? { get set }
   
   var accessToken: AccessTokenClaim? { get set }
   
@@ -12,7 +12,7 @@ public protocol GoogleToken: OAuthToken {
   
   var refreshToken: RefreshTokenClaim? { get set }
   
-  var scope: ScopeClaim { get set }
+  var scope: ScopeClaim? { get set }
   
   var tokenType: TokenTypeClaim? { get set }
 }

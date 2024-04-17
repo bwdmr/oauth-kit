@@ -3,7 +3,7 @@ import Foundation
 
 
 public protocol OAuthToken: Codable, Sendable {
-  var endpoint: URL { get set }
+  var endpoint: URL? { get set }
   
   var accessToken: AccessTokenClaim? { get set }
   
@@ -11,7 +11,7 @@ public protocol OAuthToken: Codable, Sendable {
   
   var refreshToken: RefreshTokenClaim? { get set }
   
-  var scope: ScopeClaim { get set }
+  var scope: ScopeClaim? { get set }
   
   var tokenType: TokenTypeClaim? { get set }
   
@@ -47,12 +47,14 @@ extension OAuthServiceable {
   ///
   @discardableResult
   public func add(_ token: OAuthToken) throws -> Self {
-    print("add token")
-    guard token.scope.value.count == 1
+    
+    guard 
+      let scopeList = token.scope,
+      scopeList.value.count == 1
     else { throw OAuthError.invalidToken("Can't configure multiple scopes on a single token") }
     
     
-    let scope = token.scope.value.first!
+    let scope = scopeList.value.first!
     if self.token[scope] != nil {
       print("Warning: Overwriting existing OAuth Token implementation: '\(scope)'.") }
     self.token[scope] = token
@@ -64,8 +66,6 @@ extension OAuthServiceable {
   @discardableResult
   public func add<HeadToken>(_ token: [OAuthToken], head: HeadToken)
   throws -> Self where HeadToken: OAuthToken {
-    print("iterate token")
-    
     for token in token { try self.add(token) }
     self.head = head
     

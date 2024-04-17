@@ -16,8 +16,6 @@ public actor OAuthService: Sendable {
   public func register<HeadToken>(_ service: OAuthServiceable, _ use: [OAuthToken], head: HeadToken)
   async throws -> Self where HeadToken: OAuthToken {
     
-    print("register kit")
-    
     guard use.count > 0 else {
       throw OAuthError.missingRequirement(failedToken: nil, reason: "a service requires atleast one OAuthToken.")
     }
@@ -27,7 +25,8 @@ public actor OAuthService: Sendable {
     let service = service
     
     for token in use {
-      guard token.scope.value.count == 1 else { 
+      guard let scopeList = token.scope, scopeList.value.count == 1
+      else {
         throw OAuthError.tokenScopeDefinitionFailure(
           failedToken: token, reason: "multiple scopes cannot be configured") }
     }
