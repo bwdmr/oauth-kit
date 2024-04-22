@@ -29,15 +29,14 @@ extension GoogleToken {
     guard
       let accessToken = self.accessToken,
       let expiresIn = self.expiresIn,
-      let refreshToken = self.refreshToken,
       let tokenType = self.tokenType
     else { throw OAuthError.missingRequirement(
       failedToken: other, reason: "insufficient information for authentication")}
     
     other.accessToken = accessToken
     other.expiresIn = expiresIn
-    other.refreshToken = refreshToken
-    other.scope = other.scope
+    other.refreshToken = self.refreshToken
+    other.scope = self.scope
     other.tokenType = tokenType
     
     return other
