@@ -13,11 +13,11 @@ extension String {
 
 package extension DataProtocol {
     func base64URLDecodedBytes() -> [UInt8] {
-        Data(base64Encoded: Data(copyBytes()).base64URLUnescaped())?.copyBytes() ?? []
+      [UInt8](Data([UInt8]()).base64URLUnescaped())
     }
 
     func base64URLEncodedBytes() -> [UInt8] {
-        Data(copyBytes()).base64EncodedData().base64URLEscaped().copyBytes()
+      [UInt8](Data([UInt8]()).base64EncodedData().base64URLEscaped())
     }
 }
 

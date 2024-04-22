@@ -98,14 +98,8 @@ extension OAuthServiceable {
       return String(describing: "\(key)=\(value)")
     }).joined(separator: "&")
         
-    guard let bodyData = bodyString.data(using: .utf8) 
-    else { throw OAuthError.invalidData("conversion error") }
-    
-    let buffer = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: bodyData.count)
-    defer { buffer.deallocate() }
-    let _ = bodyData.copyBytes(to: buffer)
-    
-    return [UInt8](buffer)
+    let bodyData = Array(bodyString.utf8)
+    return bodyData
   }
 }
 

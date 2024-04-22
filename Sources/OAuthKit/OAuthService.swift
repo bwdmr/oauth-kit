@@ -76,7 +76,7 @@ public actor OAuthService: Sendable {
     
     var _token: Token
     do {
-      let encodedToken = token.copyBytes()
+      let encodedToken = Array(token)
       _token = try jsonDecoder.decode(
         Token.self, from: .init(encodedToken.base64URLDecodedBytes()) )
     } catch {
