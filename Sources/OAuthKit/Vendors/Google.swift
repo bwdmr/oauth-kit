@@ -1,4 +1,3 @@
-import Combine
 import Foundation
 
 
@@ -54,7 +53,7 @@ public actor GoogleService: OAuthServiceable {
   public let authenticationEndpoint: String?
   public let tokenEndpoint: String?
   
-  @Published public var token: [String : OAuthToken] = [:]
+  public var token: [String : OAuthToken] = [:]
   public var head: (OAuthToken)?
   
   enum CodingKeys: String, CodingKey {
