@@ -1,7 +1,7 @@
 ///
 public struct IncludeGrantedScopesClaim: OAuthBooleanClaim, Equatable  {
   
-  public static var key: OAuthCodingKey = "inlcude_granted_scopes"
+  public static let key: OAuthCodingKey = "inlcude_granted_scopes"
   
   public var value: Bool
   

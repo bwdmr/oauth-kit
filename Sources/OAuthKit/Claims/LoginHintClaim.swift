@@ -1,7 +1,7 @@
 ///
 public struct LoginHintClaim: OAuthClaim, Equatable, ExpressibleByStringLiteral {
   
-  public static var key: OAuthCodingKey = "login_hint"
+  public static let key: OAuthCodingKey = "login_hint"
   
   public var value: String
   

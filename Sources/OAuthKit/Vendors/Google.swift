@@ -26,10 +26,9 @@ extension GoogleToken {
   @discardableResult
   public func mergeable<Token>(_ other: inout Token)
   async throws -> Token where Token: OAuthToken {
-    guard
-      let accessToken = self.accessToken,
-      let expiresIn = self.expiresIn,
-      let tokenType = self.tokenType
+    guard let accessToken = self.accessToken,
+          let expiresIn = self.expiresIn,
+          let tokenType = self.tokenType
     else { throw OAuthError.missingRequirement(
       failedToken: other, reason: "insufficient information for authentication")}
     
@@ -131,9 +130,8 @@ public actor GoogleService: OAuthServiceable {
   
   
   public func authenticationURL() throws -> URL {
-    guard
-      let endpoint = self.authenticationEndpoint,
-      let endpointURL = URL(string: endpoint)
+    guard let endpoint = self.authenticationEndpoint,
+          let endpointURL = URL(string: endpoint)
     else { throw OAuthError.invalidURL(
       "misconfigured endpoint: \(String(describing: self.authenticationEndpoint))"
     )}
@@ -186,9 +184,8 @@ public actor GoogleService: OAuthServiceable {
   
   
   public func tokenURL(code: String) throws -> (URL, [UInt8]) {
-    guard
-      let endpoint = self.tokenEndpoint,
-      let endpointURL = URL(string: endpoint)
+    guard let endpoint = self.tokenEndpoint,
+          let endpointURL = URL(string: endpoint)
     else {
       throw OAuthError.invalidURL("misconfigured endpoint: \(String(describing: self.tokenEndpoint))")
     }

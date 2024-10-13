@@ -1,7 +1,6 @@
 ///
 public struct GrantTypeClaim: OAuthClaim, Equatable, ExpressibleByStringLiteral {
-  
-  public static var key: OAuthCodingKey = "grant_type"
+  public static let key: OAuthCodingKey = "grant_type"
   
   public var value: String
   

@@ -1,7 +1,7 @@
 ///
 public struct EmailClaim: OAuthClaim, Equatable, ExpressibleByStringLiteral {
   
-  public static var key: OAuthCodingKey = "email"
+  public static let key: OAuthCodingKey = "email"
   
   public var value: String
   

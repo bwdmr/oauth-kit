@@ -1,7 +1,7 @@
 ///
 public struct AccessTokenClaim: OAuthClaim, Equatable, ExpressibleByStringLiteral {
   
-  public static var key: OAuthCodingKey = "access_token"
+  public static let key: OAuthCodingKey = "access_token"
   
   public var value: String
   

@@ -1,7 +1,7 @@
 /// An extremely specialized `Decoder` whose only purpose is to spoon-feed the
 /// type being decoded a single unkeyed element. This ridiculously intricate
 /// workaround is used to get around the problem of `Collection` not having any
-/// initializers for the single-value initializer of ``JWTMultiValueClaim``. The
+/// initializers for the single-value initializer of ``OAuthMultiValueClaim``. The
 /// other workaround would be to require conformance to
 /// `ExpressibleByArrayLiteral`, but what fun would that be?
 struct CollectionOfOneDecoder<T>: Decoder, UnkeyedDecodingContainer where T: Collection, T: Codable, T.Element: Codable {

@@ -2,10 +2,10 @@ import Foundation
 
 
 /// OAuth error type
-public struct OAuthError: Error, @unchecked Sendable {
+public struct OAuthError: Error, Sendable {
   public struct ErrorType: Sendable, Hashable, CustomStringConvertible {
     
-    enum Base: Sendable, Hashable {
+    enum Base: String, Sendable {
       case claimMissingRequiredMember
       case claimVerificationFailure
       case generic
@@ -42,201 +42,131 @@ public struct OAuthError: Error, @unchecked Sendable {
     public static let redirecturiMismatch = Self(.redirecturiMismatch)
     
     public var description: String {
-      switch self.base {
-      case .claimMissingRequiredMember:
-        "claim_missing_required_member"
-      case .claimVerificationFailure:
-        "claim_verification_failure"
-      case .generic:
-        "generic"
-      case .invalidBool:
-        "invalid_bool"
-      case .invalidInt:
-        "invalid_int"
-      case .invalidData:
-        "invalid_data"
-      case .invalidURL:
-        "invalid_url"
-      case .invalidService:
-        "invalid_service"
-      case .invalidToken:
-        "invalid_token"
-      case .missingService:
-        "missing_service"
-      case .missingRequirement:
-        "missing_requirement"
-      case .redirecturiMismatch:
-        "redirect_uri_mismatch"
-      case .tokenScopeDefinitionFailure:
-        "token_scope_definition_failure"
-      }
+      base.rawValue
     }
   }
   
   
-  private final class Backing {
-    fileprivate var errorType: ErrorType
-    fileprivate var name: String?
-    fileprivate var reason: String?
-    fileprivate var underlying: Error?
-    fileprivate var identifier: String?
-    fileprivate var failedClaim: (any OAuthClaim)?
-    fileprivate var failedToken: (any OAuthToken)?
+  private final class Backing: Sendable {
+    fileprivate let errorType: ErrorType
+    fileprivate let name: String?
+    fileprivate let reason: String?
+    fileprivate let underlying: Error?
+    fileprivate let identifier: String?
+    fileprivate let failedClaim: (any OAuthClaim)?
+    fileprivate let failedToken: (any OAuthToken)?
     
-    init(errorType: ErrorType) {
+    init(
+      errorType: ErrorType,
+      name: String? = nil,
+      reason: String? = nil,
+      underlying: Error? = nil,
+      identifier: String? = nil,
+      failedClaim: (any OAuthClaim)? = nil,
+      failedToken: (any OAuthToken)? = nil
+      
+    ) {
       self.errorType = errorType
+      self.name = name
+      self.reason = reason
+      self.underlying = underlying
+      self.identifier = identifier
+      self.failedClaim = failedClaim
+      self.failedToken = failedToken
     }
   }
   
   private var backing: Backing
   
-  public internal(set) var errorType: ErrorType {
-    get { self.backing.errorType }
-    set { self.backing.errorType = newValue }
-  }
+  public var errorType: ErrorType { backing.errorType }
+  public var name: String? { backing.name }
+  public var reason: String? { backing.reason }
+  public var underlying: (any Error)? { backing.underlying }
+  public var identifier: String? { backing.identifier }
+  public var failedClaim: (any OAuthClaim)? { backing.failedClaim }
+  public var failedToken: (any OAuthToken)? { backing.failedToken }
   
-  public internal(set) var name: String? {
-    get { self.backing.name }
-    set { self.backing.name = newValue }
-  }
+  private init(backing: Backing) {
+    self.backing = backing }
   
-  public internal(set) var reason: String? {
-    get { self.backing.reason }
-    set { self.backing.reason = newValue }
-  }
-  
-  public internal(set) var underlying: Error? {
-    get { self.backing.underlying }
-    set { self.backing.underlying = newValue }
-  }
-  
-  public internal(set) var identifier: String? {
-    get { self.backing.identifier }
-    set { self.backing.identifier = newValue }
-  }
-  
-  public internal(set) var failedClaim: (any OAuthClaim)? {
-    get { self.backing.failedClaim }
-    set { self.backing.failedClaim = newValue }
-  }
-  
-  public internal(set) var failedToken: (any OAuthToken)? {
-    get { self.backing.failedToken }
-    set { self.backing.failedToken = newValue }
-  }
-  
-  init(errorType: ErrorType) {
-    self.backing = .init(errorType: errorType)
-  }
-  
+  private init(errorType: ErrorType) {
+    self.backing = .init(errorType: errorType) }
   
   ///
   public static func claimMissingRequiredMember(failedClaim: (any OAuthClaim)?, reason: String) -> Self {
-    var new = Self(errorType: .claimMissingRequiredMember)
-    new.failedClaim = failedClaim
-    new.reason = reason
-    return new
+    .init(backing: .init(errorType: .claimMissingRequiredMember, reason: reason, failedClaim: failedClaim))
   }
   
   
   ///
   public static func claimVerificationFailure(failedClaim: (any OAuthClaim)?, reason: String) -> Self {
-    var new = Self(errorType: .claimVerificationFailure)
-    new.failedClaim = failedClaim
-    new.reason = reason
-    return new
+    .init(backing: .init(errorType: .claimVerificationFailure, reason: reason, failedClaim: failedClaim))
   }
   
   
   ///
   public static func tokenScopeDefinitionFailure(failedToken: (any OAuthToken)?, reason: String) -> Self {
-    var new = Self(errorType: .tokenScopeDefinitionFailure)
-    new.failedToken = failedToken
-    new.reason = reason
-    return new
+    .init(backing: .init(errorType: .tokenScopeDefinitionFailure, reason: reason, failedToken: failedToken))
   }
   
     
   ///
   public static func generic(identifier: String, reason: String) -> Self {
-    var new = Self(errorType: .generic)
-    new.identifier = identifier
-    new.reason = reason
-    return new
+    .init(backing: .init(errorType: .generic, reason: reason, identifier: identifier))
   }
   
   
   ///
   public static func invalidBool(_ name: String) -> Self {
-    var new = Self(errorType: .invalidBool)
-    new.name = name
-    return new
+    .init(backing: .init(errorType: .invalidBool, name: name))
   }
   
   
   ///
   public static func invalidData(_ name: String) -> Self {
-    var new = Self(errorType: .invalidData)
-    new.name = name
-    return new
+    .init(backing: .init(errorType: .invalidData, name: name))
   }
   
   
   ///
   public static func invalidInt(_ name: String) -> Self {
-    var new = Self(errorType: .invalidInt)
-    new.name = name
-    return new
+    .init(backing: .init(errorType: .invalidInt, name: name))
   }
  
   
   ///
   public static func invalidURL(_ name: String) -> Self {
-    var new = Self(errorType: .invalidURL)
-    new.name = name
-    return new
+    .init(backing: .init(errorType: .invalidURL, name: name))
   }
   
   
   ///
   public static func invalidService(_ name: String) -> Self {
-    var new = Self(errorType: .invalidService)
-    new.name = name
-    return new
+    .init(backing: .init(errorType: .invalidService, name: name))
   }
   
  
   ///
   public static func invalidToken(_ name: String) -> Self {
-    var new = Self(errorType: .invalidToken)
-    new.name = name
-    return new
+    .init(backing: .init(errorType: .invalidToken, name: name))
   }
   
   
   ///
   public static func missingService(_ name: String) -> Self {
-    var new = Self(errorType: .missingService)
-    new.name = name
-    return new
+    .init(backing: .init(errorType: .missingService, name: name))
   }
   
   
   ///
   public static func missingRequirement(failedToken: (any OAuthToken)?, reason: String) -> Self {
-    var new = Self(errorType: .missingRequirement)
-    new.identifier = reason
-    new.reason = reason
-    return new
+    .init(backing: .init(errorType: .missingRequirement, reason: reason, failedToken: failedToken))
   }
   
   
   ///
   public static func redirecturiMismatch(failedClaim: (any OAuthClaim)?, reason: String) -> Self {
-    var new = Self(errorType: .redirecturiMismatch)
-    new.failedClaim = failedClaim
-    new.reason = reason
-    return new
+    .init(backing: .init(errorType: .redirecturiMismatch, reason: reason, failedClaim: failedClaim))
   }
 }
 

@@ -1,7 +1,7 @@
 ///
 public struct EnableGranularConsentClaim: OAuthBooleanClaim, Equatable  {
   
-  public static var key: OAuthCodingKey = "enable_granular_consent"
+  public static let key: OAuthCodingKey = "enable_granular_consent"
   
   public var value: Bool
   

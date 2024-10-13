@@ -1,7 +1,7 @@
 ///
 public struct StateClaim: OAuthClaim, Equatable, ExpressibleByStringLiteral {
   
-  static public var key: OAuthCodingKey = "state"
+  static public let key: OAuthCodingKey = "state"
   
   public var value: String
   

@@ -3,7 +3,7 @@ import Foundation
 ///
 public struct ExpiresInClaim: OAuthIntegerClaim, Equatable {
   
-  public static var key: OAuthCodingKey = "expires_in"
+  public static let key: OAuthCodingKey = "expires_in"
   
   public var value: Int
   

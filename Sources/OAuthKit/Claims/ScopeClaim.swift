@@ -1,7 +1,7 @@
 
 
 public struct ScopeClaim: OAuthMultiValueClaim, Codable, Sendable {
-  static public var key: OAuthCodingKey = "scope"
+  static public let key: OAuthCodingKey = "scope"
   
   public var value: [String]
   

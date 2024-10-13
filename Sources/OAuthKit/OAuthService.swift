@@ -12,10 +12,10 @@ public actor OAuthService: Sendable {
   
   /// add a service
   @discardableResult
-  public func register<HeadToken>(_ service: OAuthServiceable, _ use: [OAuthToken], head: HeadToken)
+  public func register<HeadToken>(_ service: OAuthServiceable, _ tokenList: [OAuthToken], head: HeadToken)
   async throws -> Self where HeadToken: OAuthToken {
     
-    guard use.count > 0 else {
+    guard tokenList.count > 0 else {
       throw OAuthError.missingRequirement(failedToken: nil, reason: "a service requires atleast one OAuthToken.")
     }
    
@@ -23,14 +23,14 @@ public actor OAuthService: Sendable {
     
     let service = service
     
-    for token in use {
+    for token in tokenList {
       guard let scopeList = token.scope, scopeList.value.count == 1
       else {
         throw OAuthError.tokenScopeDefinitionFailure(
           failedToken: token, reason: "multiple scopes cannot be configured") }
     }
     
-    try await service.add(use, head: head)
+    try await service.add(tokenList, head: head)
     
     if self.storage[id] != nil {
       print("Warning: Overwriting existing OAuth configuration for service identifier; '\(id)'.") }

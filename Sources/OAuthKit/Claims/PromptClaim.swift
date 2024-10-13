@@ -1,7 +1,7 @@
 ///
 public struct PromptClaim: OAuthClaim, Equatable, ExpressibleByStringLiteral {
   
-  public static var key: OAuthCodingKey = "promt"
+  public static let key: OAuthCodingKey = "prompt"
   
   public var value: String
   

@@ -1,11 +1,11 @@
 import Foundation
 
 
-public struct OAuthCodingKey: CodingKey, Hashable, Equatable, ExpressibleByStringLiteral {
+public struct OAuthCodingKey: Sendable, CodingKey, Hashable, Equatable, ExpressibleByStringLiteral {
   public typealias StringLiteralType = String
   
-  public var stringValue: String
-  public var intValue: Int?
+  public let stringValue: String
+  public let intValue: Int?
   
   public init(stringLiteral: String) {
     self.init(stringValue: stringLiteral)
@@ -24,7 +24,7 @@ public struct OAuthCodingKey: CodingKey, Hashable, Equatable, ExpressibleByStrin
 
 
 
-public protocol OAuthClaim: Codable, Sendable {
+public protocol OAuthClaim: Sendable, Codable {
   associatedtype Value: Codable
   
   static var key: OAuthCodingKey { get }
@@ -50,7 +50,6 @@ public extension OAuthClaim {
     try single.encode(value)
   }
 }
-
 
 
 public protocol OAuthIntegerClaim: OAuthClaim where Value == Int, Self: ExpressibleByIntegerLiteral {}
@@ -84,7 +83,6 @@ public extension OAuthIntegerClaim {
     }
   }
 }
-
 
 
 public protocol OAuthBooleanClaim: OAuthClaim where Value == Bool, Self: ExpressibleByBooleanLiteral {}
@@ -124,6 +122,7 @@ public extension OAuthBooleanClaim {
 public protocol OAuthMultiValueClaim: OAuthClaim where Value: Collection, Value.Element: Codable {
     init(value: Value.Element)
 }
+
 
 public extension OAuthMultiValueClaim {
     /// Single-element initializer. Uses the `CollectionOfOneDecoder` to work

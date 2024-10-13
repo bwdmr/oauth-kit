@@ -1,6 +1,6 @@
 import Foundation
 
-public struct OAuthIdentifier: Hashable, Equatable, Sendable {
+public struct OAuthIdentifier: Sendable, Hashable, Equatable {
   public let string: String
   
   public init(string: String) {
