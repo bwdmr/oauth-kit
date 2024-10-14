@@ -1,6 +1,7 @@
 import Foundation
 
-
+/// Google oauth: https://developers.google.com/identity/protocols/oauth2
+/// Google scope claims: https://developers.google.com/identity/protocols/oauth2/scopes
 
 public protocol GoogleToken: OAuthToken {
   var endpoint: URL? { get set }
@@ -44,15 +45,13 @@ extension GoogleToken {
 
 
 
-@dynamicMemberLookup
 public actor GoogleService: OAuthServiceable {
   public var id: OAuthIdentifier = OAuthIdentifier(string: "google")
 
   public let authenticationEndpoint: String?
   public let tokenEndpoint: String?
   
-  public var token: [String : OAuthToken] = [:]
-  public var head: (OAuthToken)?
+  public var token: OAuthToken
   
   enum CodingKeys: String, CodingKey {
     case id = "oauth_identifier"
@@ -110,7 +109,8 @@ public actor GoogleService: OAuthServiceable {
     includegrantedScopes: IncludeGrantedScopesClaim? = nil,
     loginHint: LoginHintClaim? = nil,
     prompt: PromptClaim? = nil,
-    responseType: ResponseTypeClaim = "code"
+    responseType: ResponseTypeClaim = "code",
+    token: OAuthToken
   ) {
     self.authenticationEndpoint = authenticationEndpoint
     self.tokenEndpoint = tokenEndpoint
@@ -126,6 +126,7 @@ public actor GoogleService: OAuthServiceable {
     self.responseType = responseType
     self.scope = scope
     self.state = state
+    self.token = token
   }
   
   
@@ -214,3 +215,4 @@ public actor GoogleService: OAuthServiceable {
     return (url, data)
   }
 }
+

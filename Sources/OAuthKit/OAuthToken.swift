@@ -24,16 +24,16 @@ public protocol OAuthToken: Codable, Sendable {
 
 
 ///
-@dynamicMemberLookup
 public protocol OAuthServiceable: Actor, Sendable {
+  
   var id: OAuthIdentifier { get }
   
-  var token: [String: OAuthToken] { get set }
-  var head: (OAuthToken)? { get set }
+  var token: OAuthToken { get set }
   
   var redirectURI: RedirectURIClaim { get }
   
   func authenticationURL() async throws -> URL
+  
   func tokenURL(code: String) async throws -> (URL, [UInt8])
   
   func queryitemBuffer(_ items: [URLQueryItem]) throws -> [UInt8]
@@ -42,54 +42,6 @@ public protocol OAuthServiceable: Actor, Sendable {
 
 ///
 extension OAuthServiceable {
-  var head: (OAuthToken)? { nil }
-
-  ///
-  @discardableResult
-  public func add(_ token: OAuthToken) throws -> Self {
-    
-    guard 
-      let scopeList = token.scope,
-      scopeList.value.count == 1
-    else { throw OAuthError.invalidToken("Can't configure multiple scopes on a single token") }
-    
-    
-    let scope = scopeList.value.first!
-    if self.token[scope] != nil {
-      print("Warning: Overwriting existing OAuth Token implementation: '\(scope)'.") }
-    self.token[scope] = token
-    
-    return self
-  }
-  
-  ///
-  @discardableResult
-  public func add<HeadToken>(_ token: [OAuthToken], head: HeadToken)
-  throws -> Self where HeadToken: OAuthToken {
-    for token in token { try self.add(token) }
-    self.head = head
-    
-    return self
-  }
-  
-  
-  ///
-  subscript<T>(dynamicMember member: String) -> T? where T: OAuthToken {
-    switch member {
-    default:
-      return self.token[member] as? T
-    }
-  }
-  
-  
-  ///
-  subscript<T>(dynamicMember member: String, _ value: T) -> T where T: OAuthToken {
-    get { self.token[member] as! T }
-    set { self.token[member] = newValue }
-  }
-  
- 
-  ///
   public func queryitemBuffer(_ items: [URLQueryItem]) throws -> [UInt8] {
     let bodyString = try items.map({
       let key = $0.name
