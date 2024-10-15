@@ -13,13 +13,14 @@ public protocol GoogleToken: OAuthToken {
   var refreshToken: RefreshTokenClaim? { get set }
   
   var scope: ScopeClaim? { get set }
-  
-  var tokenType: TokenTypeClaim? { get set }
 }
 
 
 
 extension GoogleToken {
+  var tokenType: TokenTypeClaim { "Berarer" }
+  
+  
   public func verify() async throws {
     try self.expiresIn?.verifyNotExpired()
   }
@@ -69,6 +70,7 @@ public actor GoogleService: OAuthServiceable {
     case responseType = "response_type"
     case scope = "scope"
     case state = "state"
+    case tokenType = "token_type"
   }
   
   public let accessType: AccessTypeClaim
