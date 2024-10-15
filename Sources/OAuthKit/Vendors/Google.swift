@@ -22,8 +22,7 @@ extension GoogleToken {
   
   
   public func verify() async throws {
-    try self.expiresIn?.verifyNotExpired()
-  }
+    try self.expiresIn?.verifyNotExpired() }
   
   @discardableResult
   public func mergeable<Token>(_ other: inout Token)
@@ -51,8 +50,6 @@ public actor GoogleService: OAuthServiceable {
 
   public let authenticationEndpoint: String?
   public let tokenEndpoint: String?
-  
-  public var token: OAuthToken
   
   enum CodingKeys: String, CodingKey {
     case id = "oauth_identifier"
@@ -111,8 +108,7 @@ public actor GoogleService: OAuthServiceable {
     includegrantedScopes: IncludeGrantedScopesClaim? = nil,
     loginHint: LoginHintClaim? = nil,
     prompt: PromptClaim? = nil,
-    responseType: ResponseTypeClaim = "code",
-    token: OAuthToken
+    responseType: ResponseTypeClaim = "code"
   ) {
     self.authenticationEndpoint = authenticationEndpoint
     self.tokenEndpoint = tokenEndpoint
@@ -128,7 +124,6 @@ public actor GoogleService: OAuthServiceable {
     self.responseType = responseType
     self.scope = scope
     self.state = state
-    self.token = token
   }
   
   

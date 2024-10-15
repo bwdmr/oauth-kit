@@ -28,8 +28,6 @@ public protocol OAuthServiceable: Actor, Sendable {
   
   var id: OAuthIdentifier { get }
   
-  var token: OAuthToken { get set }
-  
   var redirectURI: RedirectURIClaim { get }
   
   func authenticationURL() async throws -> URL

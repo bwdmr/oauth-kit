@@ -72,12 +72,12 @@ public extension OAuthIntegerClaim {
     let single = try decoder.singleValueContainer()
     
     do {
-      try self.init(value: single.decode(Int.self))
-    } catch {
+      try self.init(value: single.decode(Int.self)) }
+    
+    catch {
       let str = try single.decode(String.self)
       guard let int = Int(str) else {
-        throw OAuthError.invalidInt(str)
-      }
+        throw OAuthError.invalidInt(str) }
       
       self.init(value: int)
     }
@@ -106,12 +106,12 @@ public extension OAuthBooleanClaim {
     let single = try decoder.singleValueContainer()
     
     do {
-      try self.init(value: single.decode(Bool.self))
-    } catch {
+      try self.init(value: single.decode(Bool.self)) }
+    
+    catch {
       let str = try single.decode(String.self)
       guard let bool = Bool(str) else {
-        throw OAuthError.invalidBool(str)
-      }
+        throw OAuthError.invalidBool(str) }
       
       self.init(value: bool)
     }
